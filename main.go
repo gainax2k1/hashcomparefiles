@@ -50,6 +50,16 @@ func main() {
 	}
 
 	if os.Args[1] == "-TRASH" {
+		// todo: add "/info" folder in .trash for storing info about trashed files, like original path, deletion date, etc. maybe add a -v flag to print this info when trashing files?
+		/*
+			example: for file called "3DMark.2.trashinfo"
+			[Trash Info]
+			Path=/mnt/nvme1n1p1/WIndows%20user%20folders/Pictures/3DMark
+			DeletionDate=2026-02-08T19:53:54
+
+
+		*/
+
 		// verify there's a directory path argument
 		if len(os.Args) < 3 {
 			log.Fatalf("Usage: %s -TRASH <directory_path>\n", os.Args[0])
