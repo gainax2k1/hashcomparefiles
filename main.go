@@ -167,7 +167,7 @@ func deleteDuplicateFiles(hashMap map[string][]walkDir.FileInfo) {
 				if err != nil {
 					log.Printf("Error deleting file %s: %v\n", paths[i].FilePath, err)
 				} else {
-					fmt.Printf("Deleted duplicate file: %s\n", paths[i])
+					fmt.Printf("Deleted duplicate file: %s\n", paths[i].FilePath)
 				}
 			}
 		}
