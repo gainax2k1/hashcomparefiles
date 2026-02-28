@@ -80,10 +80,10 @@ func main() {
 		return
 	}
 
-	if os.Args[1] == "-REMOVE" {
+	if os.Args[1] == "-DELETE" {
 		// verify there's a directory path argument
 		if len(os.Args) < 3 {
-			log.Fatalf("Usage: %s -REMOVE <directory_path>\n", os.Args[0])
+			log.Fatalf("Usage: %s -DELETE <directory_path>\n", os.Args[0])
 		}
 
 		// call WalkDir with the provided directory path
