@@ -24,6 +24,6 @@ hash-file-compare -TRASH (directory)
 
 
 ```python
-hash-file-compare -REMOVE (directory)
+hash-file-compare -DELETE (directory)
 ```
 - Scans through directory, deleting all duplicate files after the first found instance
