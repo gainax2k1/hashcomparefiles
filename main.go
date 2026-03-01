@@ -1,112 +1,137 @@
 package main
 
 import (
+	"flag" // for future use with CLI options
 	"fmt"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	hashfile "github.com/gainax2k1/hash-file-compare/hashfile"
 	walkdir "github.com/gainax2k1/hash-file-compare/walkdir"
 )
 
+type Config struct {
+	Path    string
+	Trash   bool
+	Delete  bool
+	Verbose bool
+	LogPath string
+}
+
 func main() {
 	fmt.Println("Find duplicate files by hash value")
-	if len(os.Args) < 2 {
-		log.Fatalf("Usage: %s <filename>\n", os.Args[0])
+	// Define flags
+	oneFile := flag.Bool("f", false, "Hash single file mode")
+	dirMode := flag.Bool("d", false, "Hash directory mode")
+	trashFlag := flag.Bool("trash", false, "Trash duplicate files instead of just listing")
+	deletFlag := flag.Bool("delete", false, "Delete duplicate files instead of just listing")
+	logFlag := flag.String("log", "none", "Log path, or 'default' for current directory")
+	verboseFlag := flag.Bool("v", false, "Verbose output")
+	listFlag := flag.Bool("list", false, "List duplicates without deleting/trashing")
+
+	flag.Parse()
+
+	// Remaining arguments after flags are parsed
+	args := flag.Args()
+	if len(args) < 1 {
+		log.Fatalf("Usage: %s [flags] <path>\n", os.Args[0])
+	}
+	targetPath := args[0]
+
+	// Create config struct with parsed values
+	config := Config{
+		Path:    targetPath,
+		Trash:   *trashFlag,
+		Delete:  *deletFlag,
+		Verbose: *verboseFlag,
+		LogPath: *logFlag,
 	}
 
-	// TODO!: Add logging, for duplicate files/deleteted/trashed files, and errors. Maybe add a -v flag for verbose logging?
-
-	// TODO!: Organize better flag/CLI options implimentation!
-
-	// check for -d flag here to call WalkDir
-	if os.Args[1] == "-d" {
-		// verify there's a directory path argument
-		if len(os.Args) < 3 {
-			log.Fatalf("Usage: %s -d <directory_path>\n", os.Args[0])
+	switch {
+	case *oneFile:
+		if err := runSingleFileMode(config); err != nil {
+			log.Fatal(err)
 		}
-
-		// call WalkDir with the provided directory path
-		returnedMap, err := walkdir.WalkDir(os.Args[2])
-		if err != nil {
-			log.Fatalf("Error walking directory: %v\n", err)
+	case *dirMode:
+		if err := runDirectoryMode(config); err != nil {
+			log.Fatal(err)
 		}
-
-		// Print hash files for debugging purposes
-		/*
-			for hash := range returnedMap {
-				for _, path := range returnedMap[hash] {
-					fmt.Printf("Hash: %s\nFiles: %v\n", hash, path)
-				}
-			}*/
-
-		// Display duplicate files for debugging purposes
-		fmt.Println("Printing duplicate files:")
-		displayDupicateFiles(returnedMap)
-		return
+	default:
+		log.Fatal("No valid mode specified. Use -f for single file or -d for directory mode.")
 	}
 
-	if os.Args[1] == "-TRASH" {
-		// todo: add "/info" folder in .trash for storing info about trashed files, like original path, deletion date, etc. maybe add a -v flag to print this info when trashing files?
-		/*
-			example: for file called "3DMark.2.trashinfo"
-			[Trash Info]
-			Path=/mnt/nvme1n1p1/WIndows%20user%20folders/Pictures/3DMark
-			DeletionDate=2026-02-08T19:53:54
+}
 
-
-		*/
-
-		// verify there's a directory path argument
-		if len(os.Args) < 3 {
-			log.Fatalf("Usage: %s -TRASH <directory_path>\n", os.Args[0])
-		}
-
-		// call WalkDir with the provided directory path
-		returnedMap, err := walkdir.WalkDir(os.Args[2])
-		if err != nil {
-			log.Fatalf("Error walking directory: %v\n", err)
-		}
-
-		// Remove duplicate files
-		err = trashDuplicateFiles(returnedMap)
-		if err != nil {
-			log.Fatalf("Error trashing duplicate files: %v\n", err)
-		}
-
-		return
-	}
-
-	if os.Args[1] == "-DELETE" {
-		// verify there's a directory path argument
-		if len(os.Args) < 3 {
-			log.Fatalf("Usage: %s -DELETE <directory_path>\n", os.Args[0])
-		}
-
-		// call WalkDir with the provided directory path
-		returnedMap, err := walkdir.WalkDir(os.Args[2])
-		if err != nil {
-			log.Fatalf("Error walking directory: %v\n", err)
-		}
-
-		// Remove duplicate files
-		deleteDuplicateFiles(returnedMap)
-		return
-	}
-
-	// handles single file hash value check
-	filename := os.Args[1]
-
-	fileHashValue, err := hashfile.HashFromFilename(filename)
+func runSingleFileMode(config Config) error {
+	// for single files, ignore trash, delete, and verbose flags, just print the hash value and optionally log it
+	fileHashValue, err := hashfile.HashFromFilename(config.Path)
 	if err != nil {
-		log.Fatalf("Error hashing file: %v\n", err)
+		return fmt.Errorf("Error hashing file: %v", err)
+	}
+	if config.LogPath == "none" {
+		// no logging, just print the hash value
+		fmt.Println(fileHashValue)
+		return nil
+
+	} else if config.LogPath == "default" {
+		// use current directory with timestamp
+		config.LogPath = fmt.Sprintf("hash-file-compare_%s.log", time.Now().Format("2006-01-02_150405"))
+		logFile, err := os.Create(config.LogPath)
+		if err != nil {
+			return fmt.Errorf("Error creating log file: %v", err)
+		}
+		defer logFile.Close()
+		log.SetOutput(logFile)
+
+		// Write to the file
+		fmt.Fprintf(logFile, "Hash value for file %s: %s\n", config.Path, fileHashValue)
+
+		fmt.Printf("Hash value written to log file: %s\n", config.LogPath)
+
+		return nil
+
+	} else {
+		// use provided path
+		logFile, err := os.Create(config.LogPath)
+		if err != nil {
+			return fmt.Errorf("Error creating log file: %v", err)
+		}
+		defer logFile.Close()
+		log.SetOutput(logFile)
+		// Write to the file
+		fmt.Fprintf(logFile, "Hash value for file %s: %s\n", config.Path, fileHashValue)
+
+		fmt.Printf("Hash value written to log file: %s\n", config.LogPath)
+
+		fmt.Printf("Hash value for file %s: %s\n", config.Path, fileHashValue)
+		return nil
+	}
+}
+
+func runDirectoryMode(config Config) error {
+	returnedMap, err := walkdir.WalkDir(config.Path)
+	if err != nil {
+		return fmt.Errorf("Error walking directory: %v", err)
 	}
 
-	fmt.Println(fileHashValue)
+	fmt.Println("Printing duplicate files:")
+	displayDupicateFiles(returnedMap)
 
+	if config.Trash {
+		if err := trashDuplicateFiles(returnedMap); err != nil {
+			return fmt.Errorf("Error trashing duplicate files: %v", err)
+		}
+	} else if config.Delete {
+		if err := deleteDuplicateFiles(returnedMap); err != nil {
+			return fmt.Errorf("Error deleting duplicate files: %v", err)
+		}
+	}
+
+	return nil
 }
 
 func displayDupicateFiles(hashMap map[string][]walkdir.FileInfo) {
@@ -127,6 +152,16 @@ NEED TO DO: Add functionality for linux (at least? windows might not be a proble
 on other drives (currently only works on root drives). Maybe copy them to root drive's trash? or maybe move to a folder on that drive, label it as trash
 and let user handle it?
 */
+// todo: add "/info" folder in .trash for storing info about trashed files, like original path, deletion date, etc. maybe add a -v flag to print this info when trashing files?
+/*
+	example: for file called "3DMark.2.trashinfo"
+	[Trash Info]
+	Path=/mnt/nvme1n1p1/WIndows%20user%20folders/Pictures/3DMark
+	DeletionDate=2026-02-08T19:53:54
+
+
+*/
+
 func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo) error {
 	//Get username for trash path
 	usr, err := user.Current()
@@ -168,7 +203,7 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo) error {
 	return nil
 }
 
-func deleteDuplicateFiles(hashMap map[string][]walkdir.FileInfo) {
+func deleteDuplicateFiles(hashMap map[string][]walkdir.FileInfo) error {
 	for _, paths := range hashMap {
 		if len(paths) > 1 {
 			// Keep the first file and delete the rest
