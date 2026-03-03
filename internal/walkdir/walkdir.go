@@ -15,7 +15,7 @@ import (
 	"os"
 	"path/filepath"
 
-	hashfile "github.com/gainax2k1/hash-file-compare/hashfile"
+	hashfile "github.com/gainax2k1/hash-file-compare/internal/hashfile"
 )
 
 type FileInfo struct {
