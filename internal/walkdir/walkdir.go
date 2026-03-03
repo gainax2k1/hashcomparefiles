@@ -11,9 +11,10 @@ package walkdir
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
+
+	logger "github.com/gainax2k1/hash-file-compare/internal/logger"
 
 	hashfile "github.com/gainax2k1/hash-file-compare/internal/hashfile"
 )
@@ -26,7 +27,7 @@ type FileInfo struct {
 //takes in a directory path, returns a map of hash values (of each file),
 // and slice of the file paths that correspond to each hash value
 
-func WalkDir(dir string) (map[string][]FileInfo, error) {
+func WalkDir(dir string, logger *logger.Logger) (map[string][]FileInfo, error) {
 	// map to store hash values and corresponding file paths
 	hashMap := make(map[string][]FileInfo)
 
@@ -37,17 +38,29 @@ func WalkDir(dir string) (map[string][]FileInfo, error) {
 		}
 		// Process only files, ignore directories
 		if !d.IsDir() {
+			if d.Type()&os.ModeSymlink != 0 {
+				logger.Log("Skipping symlink: %s", path)
+				return nil
+			}
+
+			fileSize, err := getFileSize(path)
+			if err != nil {
+				logger.Error("Error getting file size for %s: %v", path, err)
+				return nil // Continue with next file
+			}
+
+			if fileSize == 0 {
+				logger.Log("Skipping empty file: %s", path)
+				return nil
+			}
+
 			hashValue, err := hashfile.HashFromFilename(path)
 			// fmt.Println(hashValue, path)
 			if err != nil {
-				log.Printf("Error hashing file %s: %v\n", path, err)
+				logger.Error("Error hashing file %s: %v", path, err)
 				return nil // Continue with next file
 			}
-			fileSize, err := getFileSize(path)
-			if err != nil {
-				log.Printf("Error getting file size for %s: %v\n", path, err)
-				return nil // Continue with next file
-			}
+
 			fileInfo := FileInfo{
 				FilePath: path,
 				FileSize: fileSize,
@@ -60,10 +73,12 @@ func WalkDir(dir string) (map[string][]FileInfo, error) {
 	})
 
 	if err != nil {
+		logger.Error("Error walking directory: %v", err)
 		return nil, fmt.Errorf("Error walking: %w", err)
 	}
 	// Check if any files were processed
 	if len(hashMap) == 0 {
+		logger.Log("No files found in the directory: %s", dir)
 		return nil, errors.New("no files found in the directory")
 	}
 

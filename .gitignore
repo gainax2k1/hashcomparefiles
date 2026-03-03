@@ -34,4 +34,6 @@ go.work.sum
 # Test data
 testdata/
 testdataBACKUP/
+backupTestData/
+*.log
 

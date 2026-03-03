@@ -8,9 +8,9 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
-	"time"
 
 	hashfile "github.com/gainax2k1/hash-file-compare/internal/hashfile"
+	"github.com/gainax2k1/hash-file-compare/internal/logger"
 	walkdir "github.com/gainax2k1/hash-file-compare/internal/walkdir"
 )
 
@@ -51,13 +51,23 @@ func main() {
 		LogPath: *logFlag,
 	}
 
+	toScreen := true // default to true, if log path is specified, will be set to false in NewLogger
+
+	// Create logger. All output will be done through the logger, which will handle writing to file and/or screen based on config
+	logger, err := logger.NewLogger(config.LogPath, toScreen, config.Verbose)
+	if err != nil {
+		log.Fatalf("Error creating logger: %v", err)
+	}
+	defer logger.Close()
+
 	switch {
 	case *oneFile:
-		if err := runSingleFileMode(config); err != nil {
+
+		if err := runSingleFileMode(config, logger); err != nil {
 			log.Fatal(err)
 		}
 	case *dirMode:
-		if err := runDirectoryMode(config); err != nil {
+		if err := runDirectoryMode(config, logger); err != nil {
 			log.Fatal(err)
 		}
 	default:
@@ -66,92 +76,65 @@ func main() {
 
 }
 
-func runSingleFileMode(config Config) error {
+func runSingleFileMode(config Config, logger *logger.Logger) error { // Everywhere else, just use it:
+	//logger.Log("Scanning: %s", config.Path)
+	//logger.Log("Found duplicate: %s", filePath)
+	//logger.Log("Error: %v", err)
+
 	// for single files, ignore trash, delete, and verbose flags, just print the hash value and optionally log it
 	fileHashValue, err := hashfile.HashFromFilename(config.Path)
 	if err != nil {
+		logger.Error("Error hashing file: %v", err)
 		return fmt.Errorf("Error hashing file: %v", err)
 	}
-	if config.LogPath == "none" {
-		// no logging, just print the hash value
-		fmt.Println(fileHashValue)
-		return nil
-
-	} else if config.LogPath == "default" {
-		// use current directory with timestamp
-		config.LogPath = fmt.Sprintf("hash-file-compare_%s.log", time.Now().Format("2006-01-02_150405"))
-		logFile, err := os.Create(config.LogPath)
-		if err != nil {
-			return fmt.Errorf("Error creating log file: %v", err)
-		}
-		defer logFile.Close()
-		log.SetOutput(logFile)
-
-		// Write to the file
-		fmt.Fprintf(logFile, "Hash value for file %s: %s\n", config.Path, fileHashValue)
-
-		fmt.Printf("Hash value written to log file: %s\n", config.LogPath)
-
-		return nil
-
-	} else {
-		// use provided path
-		logFile, err := os.Create(config.LogPath)
-		if err != nil {
-			return fmt.Errorf("Error creating log file: %v", err)
-		}
-		defer logFile.Close()
-		log.SetOutput(logFile)
-		// Write to the file
-		fmt.Fprintf(logFile, "Hash value for file %s: %s\n", config.Path, fileHashValue)
-
-		fmt.Printf("Hash value written to log file: %s\n", config.LogPath)
-
-		fmt.Printf("Hash value for file %s: %s\n", config.Path, fileHashValue)
-		return nil
-	}
+	//"hash-file-compare_%s.log", time.Now().Format("2006-01-02_150405"
+	logger.Log("File: %s, Hash: %s", config.Path, fileHashValue)
+	return nil
 }
 
-func runDirectoryMode(config Config) error {
-	returnedMap, err := walkdir.WalkDir(config.Path)
+func runDirectoryMode(config Config, logger *logger.Logger) error {
+	returnedMap, err := walkdir.WalkDir(config.Path, logger)
 	if err != nil {
+		logger.Error("Error walking directory: %v", err)
 		return fmt.Errorf("Error walking directory: %v", err)
 	}
 
 	if config.Trash {
 		if err := trashDuplicateFiles(returnedMap); err != nil {
+			logger.Error("Error trashing duplicate files: %v", err)
 			return fmt.Errorf("Error trashing duplicate files: %v", err)
 		}
 	} else if config.Delete {
 		if err := deleteDuplicateFiles(returnedMap); err != nil {
+			logger.Error("Error deleting duplicate files: %v", err)
 			return fmt.Errorf("Error deleting duplicate files: %v", err)
 		}
 	} else {
 		// just list duplicates, do nothing else
-		fmt.Println("Duplicate files:")
-		displayDupicateFiles(returnedMap)
+		displayDupicateFiles(logger, returnedMap, config)
 	}
 
 	return nil
 }
 
-func displayDupicateFiles(hashMap map[string][]walkdir.FileInfo, config Config) {
+func displayDupicateFiles(logger *logger.Logger, hashMap map[string][]walkdir.FileInfo, config Config) {
 	for hash, paths := range hashMap {
 		if config.Verbose {
 			// if verbose, print all files, even if not duplicates, and include file sizes
-			fmt.Printf("Hash: %s\n", hash)
-			fmt.Println("Files:")
+			logger.Log("Hash: %s", hash)
+
 			for _, path := range paths {
-				fmt.Printf(" path: %s size: %d\n", path.FilePath, path.FileSize)
+				logger.Log(" - %s size: %d", path.FilePath, path.FileSize)
 			}
 
-		} else // if not verbose, just print instances with duplicates
-		if len(paths) > 1 {
-			fmt.Printf("Hash: %s", hash)
-			fmt.Println("Files:")
-			for _, path := range paths {
-				fmt.Printf(" path: %s size: %d\n", path.FilePath, path.FileSize)
+		} else { // if not verbose, just print instances with duplicates
 
+			if len(paths) > 1 {
+				logger.Log("Duplicate files with hash: %s", hash)
+				for _, path := range paths {
+					logger.Log(" - %s size: %d", path.FilePath, path.FileSize)
+
+				}
 			}
 		}
 	}
