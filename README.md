@@ -28,3 +28,14 @@ hash-file-compare -TRASH (directory)
 hash-file-compare -DELETE (directory)
 ```
 - Scans through directory, deleting all duplicate files after the first found instance
+
+
+```python
+hash-file-compare -log (directory/logfilename) ...
+```
+- Creates a log file in the given directory/logfilename, default is current working directory
+
+```python
+hash-file-compare --help
+```
+- Shows list of available flags and descriptions
