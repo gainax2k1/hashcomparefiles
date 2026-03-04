@@ -13,7 +13,7 @@ type Logger struct {
 	verbose   bool
 }
 
-func NewLogger(logPath string, toScreen bool, verbose bool) (*Logger, error) {
+func NewLogger(logPath string, verbose bool) (*Logger, error) {
 	var writer io.Writer
 	var file *os.File
 

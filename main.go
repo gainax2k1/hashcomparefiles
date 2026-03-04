@@ -51,10 +51,8 @@ func main() {
 		LogPath: *logFlag,
 	}
 
-	toScreen := true // default to true, if log path is specified, will be set to false in NewLogger
-
 	// Create logger. All output will be done through the logger, which will handle writing to file and/or screen based on config
-	logger, err := logger.NewLogger(config.LogPath, toScreen, config.Verbose)
+	logger, err := logger.NewLogger(config.LogPath, config.Verbose)
 	if err != nil {
 		log.Fatalf("Error creating logger: %v", err)
 	}
@@ -100,12 +98,12 @@ func runDirectoryMode(config Config, logger *logger.Logger) error {
 	}
 
 	if config.Trash {
-		if err := trashDuplicateFiles(returnedMap); err != nil {
+		if err := trashDuplicateFiles(returnedMap, logger); err != nil {
 			logger.Error("Error trashing duplicate files: %v", err)
 			return fmt.Errorf("Error trashing duplicate files: %v", err)
 		}
 	} else if config.Delete {
-		if err := deleteDuplicateFiles(returnedMap); err != nil {
+		if err := deleteDuplicateFiles(returnedMap, logger); err != nil {
 			logger.Error("Error deleting duplicate files: %v", err)
 			return fmt.Errorf("Error deleting duplicate files: %v", err)
 		}
@@ -155,10 +153,11 @@ and let user handle it?
 
 */
 
-func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo) error {
+func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.Logger) error {
 	//Get username for trash path
 	usr, err := user.Current()
 	if err != nil {
+		logger.Error("unable to get current user: %v", err)
 		return fmt.Errorf("unable to get current user: %v", err)
 	}
 
@@ -185,10 +184,11 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo) error {
 				err := os.Rename(paths[i].FilePath, destPath)
 
 				if err != nil {
-					log.Printf("Error moving to trash file %s: %v\n", paths[i].FilePath, err)
+
+					logger.Error("Error moving to trash file %s: %v", paths[i].FilePath, err)
 					return err
 				} else {
-					fmt.Printf("Trashed file: %s\n", paths[i].FilePath)
+					logger.Log("Trashed file: %s", paths[i].FilePath)
 				}
 			}
 		}
@@ -196,16 +196,16 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo) error {
 	return nil
 }
 
-func deleteDuplicateFiles(hashMap map[string][]walkdir.FileInfo) error {
+func deleteDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.Logger) error {
 	for _, paths := range hashMap {
 		if len(paths) > 1 {
 			// Keep the first file and delete the rest
 			for i := 1; i < len(paths); i++ {
 				err := os.Remove(paths[i].FilePath)
 				if err != nil {
-					log.Printf("Error deleting file %s: %v\n", paths[i].FilePath, err)
+					logger.Error("Error deleting file %s: %v", paths[i].FilePath, err)
 				} else {
-					fmt.Printf("Deleted duplicate file: %s\n", paths[i].FilePath)
+					logger.Log("Deleted duplicate file: %s", paths[i].FilePath)
 				}
 			}
 		}

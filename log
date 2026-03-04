@@ -1,0 +1,22 @@
+2026/03/03 00:41:35 Hash: 640cf79899d562e5ececfb3862a6a80239e0c04903955e965096097624efcff4
+2026/03/03 00:41:35  - testdata/testSubFolder/testUniqueB.txt size: 24
+2026/03/03 00:41:35 Hash: 49eb06f62a9e6209db241a9bc7fc0e2b084bfea4de3ece070a9670d26a74bb9d
+2026/03/03 00:41:35  - testdata/testUniqueA.txt size: 41
+2026/03/03 00:41:35 Hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
+2026/03/03 00:41:35  - testdata/testFileA.txt size: 10
+2026/03/03 00:41:35  - testdata/testSubFolder/testFileADup.txt size: 10
+2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
+2026/03/03 00:41:35 Hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
+2026/03/03 00:41:35  - testdata/testFileB.txt size: 20
+2026/03/03 00:41:35  - testdata/testSubFolder/testFileBDup.txt size: 20
+2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
+2026/03/03 00:41:35 Hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
+2026/03/03 00:41:35  - testdata/testFileC.txt size: 22
+2026/03/03 00:41:35  - testdata/testSubFolder/testFileCDup.txt size: 22
+2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
+2026/03/03 00:41:35 Hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
+2026/03/03 00:41:35  - testdata/testFileDDup.txt size: 30
+2026/03/03 00:41:35  - testdata/testSubFolder/testFileD.txt size: 30
+2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
+2026/03/03 00:41:35 Hash: 4cec2926be0fcb6218598ee9c0debbae2cb9909fa023285e9c2a9380f111839a
+2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testUniqueC.txt size: 29
