@@ -1,5 +1,5 @@
 # hash-file-compare
-CLI tool that creates and compares file hashes, using SHA-256. 
+CLI tool that computes and compares file hashes, using SHA-256. 
 This tool also makes it easy to delete duplicate files, move them to trash, or output a list of all duplicate files with their filesize. It uses SHA-256 to uniquely identify the file contents, so even if a duplicate file has a different name, it will still be flagged. The filesize is included for refrence, and for the remote chance of hash collision. 
 
 * symlinks and empty files are ignored.
@@ -9,7 +9,7 @@ This tool also makes it easy to delete duplicate files, move them to trash, or o
 ```python
 hash-file-compare -f (filename)
 ```
-- returns hash value of (filename)
+- returns hash value of a single file (filename)
 
 ```python
 hash-file-compare -d (directory)
@@ -17,13 +17,13 @@ hash-file-compare -d (directory)
 - Scans through directory and sub-directories, displaying lists of duplicate files with their size and their hash value
 
 ```python
-hash-file-compare -TRASH (directory)
+hash-file-compare -trash (directory)
 ```
-- (in progress) Scans through directory, moving all duplicate files to trash after the first found instance. Currently, only works on primary drive in linux based systems. Also, currently lacks undo/return file to original location funcionality.
+- (Linux only) Scans through directory, moving all duplicate files to trash after the first found instance. Currently, only works on primary drive in linux based systems. For non-linux systems, a folder is created in the working directory, and files are move into that, with corresponding .trashinfo files being created to record original file location.
 
 
 ```python
-hash-file-compare -DELETE (directory)
+hash-file-compare -delete (directory)
 ```
 - Scans through directory, deleting all duplicate files after the first found instance
 
@@ -39,6 +39,3 @@ hash-file-compare --help
 - Shows list of available flags and descriptions
 
 
-
-
-I developed this tool primarily to cleanup my data hoarding backup that had gotten out of hand with sloppy backups, included multiple copies of the same .iso image in multiple folders, repeated backups of cell phone pics, etc. I was able to quickly remove ~200 Gb of duplicate files on a 4 Tb drive. 
