@@ -152,6 +152,7 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 
 	// Define the trash path based on the OS
 	var trashPath, trashInfoDir string
+
 	if runtime.GOOS == "linux" {
 
 		trashPath = filepath.Join("/home", usr.Username, ".local/share/Trash/files/")
@@ -180,6 +181,9 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 	for _, paths := range hashMap {
 		if len(paths) > 1 {
 			// Keep the first file and trash the rest
+			// *Future improvement*: iterate through duplicates and ask user which one to keep,
+			//  or if they want to keep all, trash all, etc. For now, just keep the first one and trash the rest.
+
 			for i := 1; i < len(paths); i++ {
 
 				// Create a unique name for the file in the trash to avoid conflicts
@@ -193,7 +197,7 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 				// Move the file to the trash, adding trashPath to the file name
 				err := os.Rename(paths[i].FilePath, destPath)
 				if err != nil {
-					// Rename failed, try copy + delete
+					// Rename failed, try copy + delete method as a fallback (e.g. if moving across different filesystems)
 					err = copyFile(src, destPath)
 					if err != nil {
 						logger.Error("Error copying file to trash %s: %v", paths[i].FilePath, err)
@@ -214,9 +218,6 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 				infoPath := filepath.Join(trashInfoDir, enumeratedName+".trashinfo")
 				originalPath := paths[i].FilePath
 				infoContent := fmt.Sprintf("[Trash Info]\nPath=%s\nDeletionDate=%s\n", url.PathEscape(originalPath), time.Now().Format("2006-01-02T15:04:05"))
-
-				logger.Log("Writing trashinfo to: %s", infoPath)
-				logger.Log("Info content: %s", infoContent)
 
 				err = os.WriteFile(infoPath, []byte(infoContent), 0644)
 				if err != nil {

@@ -1,7 +1,7 @@
 package hashfile
 
 /*
-	goal: to recieve a filename and return the sha256 value (hex) from it.
+	recieves a filename and return the sha256 value (hex) from it.
 	plan: use the crypto/sha256 package to compute the hash value of the file.
 	steps:
 	1. open the file using os.Open

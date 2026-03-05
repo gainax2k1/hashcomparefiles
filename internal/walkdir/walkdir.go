@@ -26,6 +26,7 @@ type FileInfo struct {
 
 //takes in a directory path, returns a map of hash values (of each file),
 // and slice of the file paths that correspond to each hash value
+// Key is the hash value, value is a slice of file paths that have that hash value
 
 func WalkDir(dir string, logger *logger.Logger) (map[string][]FileInfo, error) {
 	// resolve absolute path of the directory

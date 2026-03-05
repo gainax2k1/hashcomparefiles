@@ -36,4 +36,5 @@ testdata/
 testdataBACKUP/
 backupTestData/
 *.log
+log
 
