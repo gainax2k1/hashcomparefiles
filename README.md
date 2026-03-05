@@ -19,7 +19,8 @@ hashcomparefiles -d (directory)
 ```python
 hashcomparefiles -trash (directory)
 ```
-- (Linux only) Scans through directory, moving all duplicate files to trash after the first found instance. Currently, only fully works on primary drive in Linux based systems. For non-Linux systems, a folder is created in the working directory, and files are move into that, with corresponding .trashinfo files being created to record original file location. (uses .rename(...) to trash the files, which might not work correctly on external mounts/devices. In these cases, it switches to a copy/delete process instead, which doesn not follow the FreeDesktop spec. I would like to improve this in the future.)
+- (Linux only) Scans through directory, moving all duplicate files to trash after the first found instance. Currently, only fully works on primary drive in Linux based systems. For non-Linux systems, a folder is created in the working directory, and files are move into that, with corresponding .trashinfo files being created to record original file location.
+- (Currently, -trash uses os.Rename to trash the files, which might not work correctly on external mounts/devices. In these cases, it switches to a copy/delete process instead, which doesn not follow the FreeDesktop spec. I would like to improve this in the future.)
 
 
 ```python
