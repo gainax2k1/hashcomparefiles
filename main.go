@@ -3,11 +3,15 @@ package main
 import (
 	"flag" // for future use with CLI options
 	"fmt"
+	"io"
 	"log"
+	"net/url"
 	"os"
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"time"
 
 	hashfile "github.com/gainax2k1/hash-file-compare/internal/hashfile"
 	"github.com/gainax2k1/hash-file-compare/internal/logger"
@@ -138,21 +142,6 @@ func displayDupicateFiles(logger *logger.Logger, hashMap map[string][]walkdir.Fi
 	}
 }
 
-/*
-NEED TO DO: Add functionality for linux (at least? windows might not be a problem) for handling trashing files
-on other drives (currently only works on root drives). Maybe copy them to root drive's trash? or maybe move to a folder on that drive, label it as trash
-and let user handle it?
-*/
-// todo: add "/info" folder in .trash for storing info about trashed files, like original path, deletion date, etc. maybe add a -v flag to print this info when trashing files?
-/*
-	example: for file called "3DMark.2.trashinfo"
-	[Trash Info]
-	Path=/mnt/nvme1n1p1/WIndows%20user%20folders/Pictures/3DMark
-	DeletionDate=2026-02-08T19:53:54
-
-
-*/
-
 func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.Logger) error {
 	//Get username for trash path
 	usr, err := user.Current()
@@ -162,16 +151,30 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 	}
 
 	// Define the trash path based on the OS
-	var trashPath string
-	switch runtime.GOOS {
-	case "windows":
-		trashPath = "C:\\$Recycle.Bin\\"
-	case "darwin": //macOS
-		trashPath = filepath.Join("/Users", usr.Username, ".Trash")
-	case "linux":
+	var trashPath, trashInfoDir string
+	if runtime.GOOS == "linux" {
+
 		trashPath = filepath.Join("/home", usr.Username, ".local/share/Trash/files/")
-	default:
-		return fmt.Errorf("unsupported OS for trashing files")
+		trashInfoDir = filepath.Join("/home", usr.Username, ".local/share/Trash/info/")
+		// Ensure the trash info directory exists
+		if _, err := os.Stat(trashInfoDir); os.IsNotExist(err) {
+			err := os.MkdirAll(trashInfoDir, 0755)
+			if err != nil {
+				logger.Error("Error creating trash info directory: %v", err)
+				return fmt.Errorf("Error creating trash info directory: %v", err)
+			}
+		}
+	} else {
+		trashPath = "trash"
+		trashInfoDir = ""
+		// Ensure the trash directory exists
+		if _, err := os.Stat(trashPath); os.IsNotExist(err) {
+			err := os.Mkdir(trashPath, 0755)
+			if err != nil {
+				logger.Error("Error creating trash info directory: %v", err)
+				return err
+			}
+		}
 	}
 
 	for _, paths := range hashMap {
@@ -179,17 +182,48 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 			// Keep the first file and trash the rest
 			for i := 1; i < len(paths); i++ {
 
-				destPath := filepath.Join(trashPath, filepath.Base(paths[i].FilePath))
+				// Create a unique name for the file in the trash to avoid conflicts
+				ext := filepath.Ext(paths[i].FilePath)
+				name := strings.TrimSuffix(filepath.Base(paths[i].FilePath), ext)
+				enumeratedName := fmt.Sprintf("%s_%d%s", name, i, ext)
+
+				destPath := filepath.Join(trashPath, enumeratedName)
+				src := paths[i].FilePath
+
 				// Move the file to the trash, adding trashPath to the file name
 				err := os.Rename(paths[i].FilePath, destPath)
-
 				if err != nil {
+					// Rename failed, try copy + delete
+					err = copyFile(src, destPath)
+					if err != nil {
+						logger.Error("Error copying file to trash %s: %v", paths[i].FilePath, err)
+						return err
+					}
+					err = os.Remove(src)
+					if err != nil {
+						logger.Error("Error deleting original file after copying to trash %s: %v", paths[i].FilePath, err)
+						return err
+					}
 
-					logger.Error("Error moving to trash file %s: %v", paths[i].FilePath, err)
-					return err
+					logger.Log("Trashed file (copy+delete): %s", paths[i].FilePath)
 				} else {
 					logger.Log("Trashed file: %s", paths[i].FilePath)
 				}
+
+				// Create .trashinfo file
+				infoPath := filepath.Join(trashInfoDir, enumeratedName+".trashinfo")
+				originalPath := paths[i].FilePath
+				infoContent := fmt.Sprintf("[Trash Info]\nPath=%s\nDeletionDate=%s\n", url.PathEscape(originalPath), time.Now().Format("2006-01-02T15:04:05"))
+
+				logger.Log("Writing trashinfo to: %s", infoPath)
+				logger.Log("Info content: %s", infoContent)
+
+				err = os.WriteFile(infoPath, []byte(infoContent), 0644)
+				if err != nil {
+					logger.Error("Error creating trash info file for %s: %v", paths[i].FilePath, err)
+					return err
+				}
+
 			}
 		}
 	}
@@ -208,7 +242,25 @@ func deleteDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.
 					logger.Log("Deleted duplicate file: %s", paths[i].FilePath)
 				}
 			}
+
 		}
 	}
 	return nil
+}
+
+func copyFile(src, dest string) error {
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	destFile, err := os.Create(dest)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, srcFile)
+	return err
 }

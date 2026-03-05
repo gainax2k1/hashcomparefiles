@@ -1,22 +1,42 @@
-2026/03/03 00:41:35 Hash: 640cf79899d562e5ececfb3862a6a80239e0c04903955e965096097624efcff4
-2026/03/03 00:41:35  - testdata/testSubFolder/testUniqueB.txt size: 24
-2026/03/03 00:41:35 Hash: 49eb06f62a9e6209db241a9bc7fc0e2b084bfea4de3ece070a9670d26a74bb9d
-2026/03/03 00:41:35  - testdata/testUniqueA.txt size: 41
-2026/03/03 00:41:35 Hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
-2026/03/03 00:41:35  - testdata/testFileA.txt size: 10
-2026/03/03 00:41:35  - testdata/testSubFolder/testFileADup.txt size: 10
-2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
-2026/03/03 00:41:35 Hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
-2026/03/03 00:41:35  - testdata/testFileB.txt size: 20
-2026/03/03 00:41:35  - testdata/testSubFolder/testFileBDup.txt size: 20
-2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
-2026/03/03 00:41:35 Hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
-2026/03/03 00:41:35  - testdata/testFileC.txt size: 22
-2026/03/03 00:41:35  - testdata/testSubFolder/testFileCDup.txt size: 22
-2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
-2026/03/03 00:41:35 Hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
-2026/03/03 00:41:35  - testdata/testFileDDup.txt size: 30
-2026/03/03 00:41:35  - testdata/testSubFolder/testFileD.txt size: 30
-2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
-2026/03/03 00:41:35 Hash: 4cec2926be0fcb6218598ee9c0debbae2cb9909fa023285e9c2a9380f111839a
-2026/03/03 00:41:35  - testdata/testSubFolder/testFolderNested/testUniqueC.txt size: 29
+2026/03/04 19:39:56 Skipping empty file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/emptyfile.txt
+2026/03/04 19:39:56 Skipping empty file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/emptyfile.txt
+2026/03/04 19:39:56 Trashed file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/testFileCDup.txt
+2026/03/04 19:39:56 Writing trashinfo to: /home/gainax2k1/.local/share/Trash/info/testFileCDup_1.txt.trashinfo
+2026/03/04 19:39:56 Info content: [Trash Info]
+Path=%2Fhome%2Fgainax2k1%2FDocuments%2Fworkspace%2Fhash-file-compare%2Ftestdata%2FtestSubFolder%2FtestFileCDup.txt
+DeletionDate=2026-03-04T19:39:56
+2026/03/04 19:39:56 Trashed file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/testFolderNested/testFileCDup.txt
+2026/03/04 19:39:56 Writing trashinfo to: /home/gainax2k1/.local/share/Trash/info/testFileCDup_2.txt.trashinfo
+2026/03/04 19:39:56 Info content: [Trash Info]
+Path=%2Fhome%2Fgainax2k1%2FDocuments%2Fworkspace%2Fhash-file-compare%2Ftestdata%2FtestSubFolder%2FtestFolderNested%2FtestFileCDup.txt
+DeletionDate=2026-03-04T19:39:56
+2026/03/04 19:39:56 Trashed file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/testFileD.txt
+2026/03/04 19:39:56 Writing trashinfo to: /home/gainax2k1/.local/share/Trash/info/testFileD_1.txt.trashinfo
+2026/03/04 19:39:56 Info content: [Trash Info]
+Path=%2Fhome%2Fgainax2k1%2FDocuments%2Fworkspace%2Fhash-file-compare%2Ftestdata%2FtestSubFolder%2FtestFileD.txt
+DeletionDate=2026-03-04T19:39:56
+2026/03/04 19:39:56 Trashed file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/testFolderNested/testFileD.txt
+2026/03/04 19:39:56 Writing trashinfo to: /home/gainax2k1/.local/share/Trash/info/testFileD_2.txt.trashinfo
+2026/03/04 19:39:56 Info content: [Trash Info]
+Path=%2Fhome%2Fgainax2k1%2FDocuments%2Fworkspace%2Fhash-file-compare%2Ftestdata%2FtestSubFolder%2FtestFolderNested%2FtestFileD.txt
+DeletionDate=2026-03-04T19:39:56
+2026/03/04 19:39:56 Trashed file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/testFileADup.txt
+2026/03/04 19:39:56 Writing trashinfo to: /home/gainax2k1/.local/share/Trash/info/testFileADup_1.txt.trashinfo
+2026/03/04 19:39:56 Info content: [Trash Info]
+Path=%2Fhome%2Fgainax2k1%2FDocuments%2Fworkspace%2Fhash-file-compare%2Ftestdata%2FtestSubFolder%2FtestFileADup.txt
+DeletionDate=2026-03-04T19:39:56
+2026/03/04 19:39:56 Trashed file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/testFolderNested/testFileADup.txt
+2026/03/04 19:39:56 Writing trashinfo to: /home/gainax2k1/.local/share/Trash/info/testFileADup_2.txt.trashinfo
+2026/03/04 19:39:56 Info content: [Trash Info]
+Path=%2Fhome%2Fgainax2k1%2FDocuments%2Fworkspace%2Fhash-file-compare%2Ftestdata%2FtestSubFolder%2FtestFolderNested%2FtestFileADup.txt
+DeletionDate=2026-03-04T19:39:56
+2026/03/04 19:39:56 Trashed file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/testFileBDup.txt
+2026/03/04 19:39:56 Writing trashinfo to: /home/gainax2k1/.local/share/Trash/info/testFileBDup_1.txt.trashinfo
+2026/03/04 19:39:56 Info content: [Trash Info]
+Path=%2Fhome%2Fgainax2k1%2FDocuments%2Fworkspace%2Fhash-file-compare%2Ftestdata%2FtestSubFolder%2FtestFileBDup.txt
+DeletionDate=2026-03-04T19:39:56
+2026/03/04 19:39:56 Trashed file: /home/gainax2k1/Documents/workspace/hash-file-compare/testdata/testSubFolder/testFolderNested/testFileBDup.txt
+2026/03/04 19:39:56 Writing trashinfo to: /home/gainax2k1/.local/share/Trash/info/testFileBDup_2.txt.trashinfo
+2026/03/04 19:39:56 Info content: [Trash Info]
+Path=%2Fhome%2Fgainax2k1%2FDocuments%2Fworkspace%2Fhash-file-compare%2Ftestdata%2FtestSubFolder%2FtestFolderNested%2FtestFileBDup.txt
+DeletionDate=2026-03-04T19:39:56

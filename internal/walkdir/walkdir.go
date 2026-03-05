@@ -28,15 +28,22 @@ type FileInfo struct {
 // and slice of the file paths that correspond to each hash value
 
 func WalkDir(dir string, logger *logger.Logger) (map[string][]FileInfo, error) {
+	// resolve absolute path of the directory
+	absDir, err := filepath.Abs(dir)
+	if err != nil {
+		logger.Error("Error resolving absolute path for directory %s: %v", dir, err)
+		return nil, fmt.Errorf("error resolving absolute path: %w", err)
+	}
+
 	// map to store hash values and corresponding file paths
 	hashMap := make(map[string][]FileInfo)
 
 	//refactoring using WalkDir function (replaced deprecated Walk function)
-	err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+	err = filepath.WalkDir(absDir, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		// Process only files, ignore directories
+		// Process only files, ignore directories, symlinks, and empty files
 		if !d.IsDir() {
 			if d.Type()&os.ModeSymlink != 0 {
 				logger.Log("Skipping symlink: %s", path)
@@ -55,7 +62,6 @@ func WalkDir(dir string, logger *logger.Logger) (map[string][]FileInfo, error) {
 			}
 
 			hashValue, err := hashfile.HashFromFilename(path)
-			// fmt.Println(hashValue, path)
 			if err != nil {
 				logger.Error("Error hashing file %s: %v", path, err)
 				return nil // Continue with next file
