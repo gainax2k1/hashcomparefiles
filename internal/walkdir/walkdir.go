@@ -1,15 +1,6 @@
 package walkdir
 
-// purpose: walk through all the files in a directory
-// then call the hashFile mod with each file
-// then each returned hash should be stored in a map
-// and then returned.
-
-// todo: add filesize info?
-// todo: make struct to hold values instead of map[string][]string (might be cleaner?, can inlcude filesize info in struct too)
-
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -32,14 +23,13 @@ func WalkDir(dir string, logger *logger.Logger) (map[string][]FileInfo, error) {
 	// resolve absolute path of the directory
 	absDir, err := filepath.Abs(dir)
 	if err != nil {
-		logger.Error("Error resolving absolute path for directory %s: %v", dir, err)
 		return nil, fmt.Errorf("error resolving absolute path: %w", err)
 	}
 
 	// map to store hash values and corresponding file paths
 	hashMap := make(map[string][]FileInfo)
 
-	//refactoring using WalkDir function (replaced deprecated Walk function)
+	//refactored using WalkDir function (replaced deprecated Walk function)
 	err = filepath.WalkDir(absDir, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -51,12 +41,13 @@ func WalkDir(dir string, logger *logger.Logger) (map[string][]FileInfo, error) {
 				return nil
 			}
 
-			fileSize, err := getFileSize(path)
+			info, err := d.Info() // replaces my getFileSize(path) call, which was redundant (os.DirEntry already has it)
 			if err != nil {
-				logger.Error("Error getting file size for %s: %v", path, err)
-				return nil // Continue with next file
+				logger.Error("Error getting file info for %s: %v", path, err)
+				return nil // Skip this file and move to the next
 			}
 
+			fileSize := info.Size()
 			if fileSize == 0 {
 				logger.Log("Skipping empty file: %s", path)
 				return nil
@@ -73,6 +64,7 @@ func WalkDir(dir string, logger *logger.Logger) (map[string][]FileInfo, error) {
 				FileSize: fileSize,
 			}
 
+			// appends file to slice of files with that hash value
 			hashMap[hashValue] = append(hashMap[hashValue], fileInfo)
 		}
 
@@ -80,23 +72,9 @@ func WalkDir(dir string, logger *logger.Logger) (map[string][]FileInfo, error) {
 	})
 
 	if err != nil {
-		logger.Error("Error walking directory: %v", err)
 		return nil, fmt.Errorf("Error walking: %w", err)
-	}
-	// Check if any files were processed
-	if len(hashMap) == 0 {
-		logger.Log("No files found in the directory: %s", dir)
-		return nil, errors.New("no files found in the directory")
 	}
 
 	// Return the map of hash values and file paths
 	return hashMap, nil
-}
-
-func getFileSize(filename string) (int64, error) {
-	fi, err := os.Stat(filename)
-	if err != nil {
-		return 0, err
-	}
-	return fi.Size(), nil
 }

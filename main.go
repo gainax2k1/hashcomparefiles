@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag" // for future use with CLI options
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	hashfile "github.com/gainax2k1/hashcomparefiles/internal/hashfile"
 	"github.com/gainax2k1/hashcomparefiles/internal/logger"
 	walkdir "github.com/gainax2k1/hashcomparefiles/internal/walkdir"
 )
@@ -27,15 +26,32 @@ type Config struct {
 }
 
 func main() {
+	// Check if data is being piped in through stdin
+	/* not yet implimented
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		// Data is being piped in
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			path := scanner.Text()
+			if path == "" {
+				continue
+			}
+
+	}
+			// Now you can process this path just like a command-line argument!
+		}
+			} else {
+				// No pipe, maybe look for command line arguments?
+			}
+		}
+	} */
+
 	// Define flags
-	oneFile := flag.Bool("f", false, "Hash single file mode")
-	dirMode := flag.Bool("d", false, "Hash directory mode")
 	trashFlag := flag.Bool("trash", false, "Trash duplicate files instead of just listing")
 	deletFlag := flag.Bool("delete", false, "Delete duplicate files instead of just listing")
 	logFlag := flag.String("log", "none", "Log path, or 'default' for current directory")
 	verboseFlag := flag.Bool("v", false, "verbose mode,")
-	//list mode will be default behavior, just list duplicates without deleting or trashing.
-	//listFlag := flag.Bool("list", false, "List duplicates without deleting/trashing")
 
 	flag.Parse()
 
@@ -62,64 +78,36 @@ func main() {
 	}
 	defer logger.Close()
 
-	switch {
-	case *oneFile:
-
-		if err := runSingleFileMode(config, logger); err != nil {
-			log.Fatal(err)
-		}
-	case *dirMode:
-		if err := runDirectoryMode(config, logger); err != nil {
-			log.Fatal(err)
-		}
-	default:
-		log.Fatal("No valid mode specified. Use -f for single file or -d for directory mode.")
-	}
-
-}
-
-func runSingleFileMode(config Config, logger *logger.Logger) error { // Everywhere else, just use it:
-	//logger.Log("Scanning: %s", config.Path)
-	//logger.Log("Found duplicate: %s", filePath)
-	//logger.Log("Error: %v", err)
-
-	// for single files, ignore trash, delete, and verbose flags, just print the hash value and optionally log it
-	fileHashValue, err := hashfile.HashFromFilename(config.Path)
+	err = process(config, logger)
 	if err != nil {
-		logger.Error("Error hashing file: %v", err)
-		return fmt.Errorf("Error hashing file: %v", err)
+		logger.Error("Error running directory mode: %v", err)
 	}
-	//"hash-file-compare_%s.log", time.Now().Format("2006-01-02_150405"
-	logger.Log("File: %s, Hash: %s", config.Path, fileHashValue)
-	return nil
+
 }
 
-func runDirectoryMode(config Config, logger *logger.Logger) error {
+func process(config Config, logger *logger.Logger) error {
 	returnedMap, err := walkdir.WalkDir(config.Path, logger)
 	if err != nil {
-		logger.Error("Error walking directory: %v", err)
 		return fmt.Errorf("Error walking directory: %v", err)
 	}
 
 	if config.Trash {
 		if err := trashDuplicateFiles(returnedMap, logger); err != nil {
-			logger.Error("Error trashing duplicate files: %v", err)
 			return fmt.Errorf("Error trashing duplicate files: %v", err)
 		}
 	} else if config.Delete {
 		if err := deleteDuplicateFiles(returnedMap, logger); err != nil {
-			logger.Error("Error deleting duplicate files: %v", err)
 			return fmt.Errorf("Error deleting duplicate files: %v", err)
 		}
 	} else {
 		// just list duplicates, do nothing else
-		displayDupicateFiles(logger, returnedMap, config)
+		displayHashMap(logger, returnedMap, config)
 	}
 
 	return nil
 }
 
-func displayDupicateFiles(logger *logger.Logger, hashMap map[string][]walkdir.FileInfo, config Config) {
+func displayHashMap(logger *logger.Logger, hashMap map[string][]walkdir.FileInfo, config Config) {
 	for hash, paths := range hashMap {
 		if config.Verbose {
 			// if verbose, print all files, even if not duplicates, and include file sizes
@@ -146,7 +134,6 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 	//Get username for trash path
 	usr, err := user.Current()
 	if err != nil {
-		logger.Error("unable to get current user: %v", err)
 		return fmt.Errorf("unable to get current user: %v", err)
 	}
 
@@ -155,24 +142,22 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 
 	if runtime.GOOS == "linux" {
 
-		trashPath = filepath.Join("/home", usr.Username, ".local/share/Trash/files/")
-		trashInfoDir = filepath.Join("/home", usr.Username, ".local/share/Trash/info/")
+		trashPath = filepath.Join(usr.HomeDir, usr.Username, ".local/share/Trash/files/")
+		trashInfoDir = filepath.Join(usr.HomeDir, usr.Username, ".local/share/Trash/info/")
 		// Ensure the trash info directory exists
 		if _, err := os.Stat(trashInfoDir); os.IsNotExist(err) {
 			err := os.MkdirAll(trashInfoDir, 0755)
 			if err != nil {
-				logger.Error("Error creating trash info directory: %v", err)
 				return fmt.Errorf("Error creating trash info directory: %v", err)
 			}
 		}
 	} else {
 		trashPath = "trash"
-		trashInfoDir = ""
+		trashInfoDir = "trash"
 		// Ensure the trash directory exists
 		if _, err := os.Stat(trashPath); os.IsNotExist(err) {
 			err := os.Mkdir(trashPath, 0755)
 			if err != nil {
-				logger.Error("Error creating trash info directory: %v", err)
 				return err
 			}
 		}
@@ -195,9 +180,10 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 				src := paths[i].FilePath
 
 				// Move the file to the trash, adding trashPath to the file name
+				// First try to rename (move) the file, which is more efficient.
 				err := os.Rename(paths[i].FilePath, destPath)
 				if err != nil {
-					// Rename failed, try copy + delete method as a fallback (e.g. if moving across different filesystems)
+					// Rename failed, try copy + delete method as a fallback
 					err = copyFile(src, destPath)
 					if err != nil {
 						logger.Error("Error copying file to trash %s: %v", paths[i].FilePath, err)
@@ -214,7 +200,9 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 					logger.Log("Trashed file: %s", paths[i].FilePath)
 				}
 
-				// Create .trashinfo file
+				// Create .trashinfo file (to FreeDesktop spec) if on Linux in appropriate directory, non-Linux will place .trashinfo files
+				// in the same directory as the trashed files for simplicity
+
 				infoPath := filepath.Join(trashInfoDir, enumeratedName+".trashinfo")
 				originalPath := paths[i].FilePath
 				infoContent := fmt.Sprintf("[Trash Info]\nPath=%s\nDeletionDate=%s\n", url.PathEscape(originalPath), time.Now().Format("2006-01-02T15:04:05"))
@@ -232,6 +220,8 @@ func trashDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.L
 }
 
 func deleteDuplicateFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.Logger) error {
+	// Iterate through the hash map and delete duplicate files, keeping the first instance
+	// *Future improvement*: iterate through duplicates and ask user which one to keep.
 	for _, paths := range hashMap {
 		if len(paths) > 1 {
 			// Keep the first file and delete the rest

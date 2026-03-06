@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type Logger struct {
@@ -16,32 +17,28 @@ type Logger struct {
 func NewLogger(logPath string, verbose bool) (*Logger, error) {
 	var writer io.Writer
 	var file *os.File
+	var err error
+	var cwd string
 
 	if logPath == "none" {
-
 		writer = os.Stdout
-	} else if logPath == "default" {
-		cwd, err := os.Getwd()
-		if err != nil {
-			return nil, fmt.Errorf("error getting current working directory: %w", err)
-		}
-		logPath = fmt.Sprintf("%s/log.log", cwd)
-
-		file, err = os.Create(logPath)
-		if err != nil {
-			return nil, fmt.Errorf("error creating log file: %w", err)
-		}
-
-		writer = io.MultiWriter(os.Stdout, file)
-
 	} else {
-
-		file, err := os.Create(logPath)
-		if err != nil {
-			return nil, fmt.Errorf("error creating log file: %w", err)
+		if logPath == "default" {
+			cwd, err = os.Getwd()
+			if err != nil {
+				return nil, fmt.Errorf("error getting current working directory: %w", err)
+			}
+			logPath = filepath.Join(cwd, "log.log")
 		}
+		// append log if exists, else create new log
+		file, err = os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
-		writer = io.MultiWriter(os.Stdout, file)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: Could not open log file %s: %v. Logging to console instead.\n", logPath, err)
+			writer = os.Stdout
+		} else {
+			writer = io.MultiWriter(os.Stdout, file)
+		}
 	}
 
 	return &Logger{
