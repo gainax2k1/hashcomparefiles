@@ -154,9 +154,7 @@ func displayHashMap(logger *logger.Logger, hashMap map[string][]walkdir.FileInfo
 }
 
 func removeFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.Logger, config *Config) error {
-	// Iterate through the hash map and delete duplicate files, keeping the first instance
-	// *Future improvement*: iterate through duplicates and ask user which one to keep.
-
+	// Setup input for user choices for delete, remove, etc
 	tty, err := os.Open("/dev/tty")
 	if err != nil {
 		return fmt.Errorf("cannot open tty for interactive input: %v", err)
@@ -164,9 +162,7 @@ func removeFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.Logger, c
 	defer tty.Close()
 
 	reader := bufio.NewReader(tty)
-
-	//reader := bufio.NewReader(os.Stdin)
-
+	
 nextHash:
 	for hash, paths := range hashMap {
 
@@ -178,7 +174,6 @@ nextHash:
 		}
 		//display list of files with this same hash
 		displayHashMap(logger, subMap)
-		//logger.Log("Duplicates: %d", pathsCount)
 
 		// iterate through file list
 	nextDuplicate:
