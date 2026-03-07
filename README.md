@@ -1,8 +1,12 @@
 <h1> hashcomparefiles</h1>
-CLI tool that computes and compares file hashes, using SHA-256. 
-This tool also makes it easy to delete duplicate files, move them to trash, or output a list of all duplicate files with their filesize. It uses SHA-256 to uniquely identify the file contents, so even if a duplicate file has a different name, it will still be flagged. The filesize is included for refrence, and for the remote chance of hash collision. 
+A robust CLI tool that computes file hashes to identify duplicate files regardless of filename, using SHA-256, and presents them to the user. 
+- This tool also makes it easy to selectively delete duplicate files, move them to trash, or output a list of all duplicate files with their filesize.
+- The filesize is included for refrence, and for the remote chance of hash collision. 
 
-* symlinks and empty files are ignored.
+
+* symlinks and empty files are ignored
+* sub-folders are automatically walked and included
+* compatible with piping in lists of folders/filenames for more customization
 
 # Usage:
 
@@ -10,9 +14,6 @@ This tool also makes it easy to delete duplicate files, move them to trash, or o
 hashcomparefiles (filename/directory)
 ```
 - returns hash value of a single file or through directory and sub-directories, displaying lists of duplicate files with their size and their hash value
-
-
-
 
 ```python
 hashcomparefiles -remove (directory)
