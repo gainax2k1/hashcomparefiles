@@ -1,4 +1,4 @@
-# hashcomparefiles
+<h1> hashcomparefiles</h1>
 CLI tool that computes and compares file hashes, using SHA-256. 
 This tool also makes it easy to delete duplicate files, move them to trash, or output a list of all duplicate files with their filesize. It uses SHA-256 to uniquely identify the file contents, so even if a duplicate file has a different name, it will still be flagged. The filesize is included for refrence, and for the remote chance of hash collision. 
 
