@@ -17,7 +17,7 @@ import (
 	"os"
 )
 
-func HashFromFilename(filename string) (string, error) {
+func FullHash(filename string) (string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return "", err
@@ -32,4 +32,21 @@ func HashFromFilename(filename string) (string, error) {
 	hash := hasher.Sum(nil)
 
 	return hex.EncodeToString(hash), nil
+}
+
+func PartialHash(filename string) (string, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	buffer := make([]byte, 4096)
+	n, err := file.Read(buffer)
+	if err != nil && err != io.EOF {
+		return "", err
+	}
+
+	hash := sha256.Sum256(buffer[:n])
+	return hex.EncodeToString(hash[:]), nil
 }

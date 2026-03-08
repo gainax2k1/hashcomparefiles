@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gainax2k1/hashcomparefiles/internal/hashfile"
 	"github.com/gainax2k1/hashcomparefiles/internal/logger"
 	walkdir "github.com/gainax2k1/hashcomparefiles/internal/walkdir"
 )
@@ -90,30 +91,20 @@ func main() {
 }
 
 func process(targets []string, config Config, logger *logger.Logger) error {
+	// 1. Make map (key=filesize, value=[]filepaths)
+	// --- ignore all symlinks, zero size files
+	// 2. For each key, if len(value) > 1, then run smaller hash on each file, make map of (key=hash, value=[]filepaths)
+	// --- first pass, save on hashing on large files unless neccessary
+	// 3. For each key, if len(value) > 1, then run full hash on each file, make map of (key=hash, value=[]filepaths)
+	// --- 2nd pass, run fullhash on remaining files
 
-	masterMap := make(map[string][]walkdir.FileInfo)
+	// FIRST PASS:
+	fileSizeMap := make(map[int64][]string)
 	totalCount := 0
-	runHash := false
 
-	if config.ShowPreHashCount {
-		for _, path := range targets {
-			// Run the walk for each path and merge results into masterMap
-			_, count, err := walkdir.WalkDir(path, logger, runHash)
-			if err != nil {
-				logger.Error("Skipping %s due to error: %v", path, err)
-				continue // Keep going with other targets!
-			}
-
-			totalCount += count
-		}
-		logger.Log("Total files to process: %d", totalCount)
-		totalCount = 0 // reset for hashing run
-	}
-
-	runHash = true
 	for _, path := range targets {
 		// Run the walk for each path and merge results into masterMap
-		dirMap, count, err := walkdir.WalkDir(path, logger, runHash)
+		dirMap, count, err := walkdir.WalkGetFileSizes(path, logger)
 		if err != nil {
 			logger.Error("Skipping %s due to error: %v", path, err)
 			continue // Keep going with other targets!
@@ -121,23 +112,71 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 
 		totalCount += count
 		// Merge dirMap into masterMap
-		for hash, files := range dirMap {
-			masterMap[hash] = append(masterMap[hash], files...)
+		for size, files := range dirMap {
+			fileSizeMap[size] = append(fileSizeMap[size], files...)
+		}
+	}
+	logger.Log("Filecount after first pass: %d", totalCount) // possibly remove
+
+	// SECOND PASS:
+	firstPassHashes := make(map[string][]walkdir.FileInfo)
+	totalCount = 0 //reset
+
+	for filesize, files := range fileSizeMap {
+		if len(files) == 1 { // only one file with this size
+			continue // skip this file
+		}
+		// multiple files with this size, so we need to compare them
+		for _, file := range files {
+			partialHash, err := hashfile.PartialHash(file)
+			if err != nil {
+				logger.Error("Error partial hashing file %s: %v", file, err)
+				continue // skip this file
+			}
+			var fileInfo walkdir.FileInfo
+			fileInfo.FilePath = file
+			fileInfo.FileSize = filesize
+
+			firstPassHashes[partialHash] = append(firstPassHashes[partialHash], fileInfo)
+			totalCount++
+		}
+	}
+	logger.Log("Filecount after second pass: %d", totalCount) // possibly remove
+
+	// THIRD PASS:
+	finalDuplicates := make(map[string][]walkdir.FileInfo)
+	totalCount = 0 //reset
+	for _, files := range firstPassHashes {
+		if len(files) == 1 { // only one file with this size
+			continue // skip this file, hash to be unique
+		}
+		for _, file := range files {
+			fullHash, err := hashfile.FullHash(file.FilePath)
+			if err != nil {
+				logger.Error("Error full hashing file %s: %v", file, err)
+				continue // skip this file
+			}
+			finalDuplicates[fullHash] = append(finalDuplicates[fullHash], file)
+			totalCount++
 		}
 	}
 
+	logger.Log("Filecount after third pass: %d", totalCount) // possibly remove
+
 	//shrink map to only duplicates because we don't need unique hashes
-	masterMap, totalCount = filterDuplicates(masterMap)
+	finalMap, totalCount := filterDuplicates(finalDuplicates)
+	logger.Log("Filecount after shrink: %d", totalCount) // possibly remove
 
 	if config.RemoveFlag {
-		err := removeFiles(masterMap, logger, &config)
+		err := removeFiles(finalMap, logger, &config)
 		if err != nil {
 			return err
 		}
 	} else {
-		displayHashMap(logger, masterMap)
+		displayHashMap(logger, finalMap)
 	}
 	return nil
+
 }
 
 func displayHashMap(logger *logger.Logger, hashMap map[string][]walkdir.FileInfo) {
@@ -336,13 +375,14 @@ func getUserChoice(reader *bufio.Reader) (string, error) {
 	}
 }
 func filterDuplicates(hashMap map[string][]walkdir.FileInfo) (map[string][]walkdir.FileInfo, int) {
+	finalMap := make(map[string][]walkdir.FileInfo)
 	count := 0
 	for hash, paths := range hashMap {
-		if len(paths) <= 1 {
-			delete(hashMap, hash)
-		} else {
-			count++
+		if len(paths) == 1 {
+			continue //unique, ignore
 		}
+		count++
+		finalMap[hash] = paths
 	}
-	return hashMap, count
+	return finalMap, count
 }
