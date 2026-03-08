@@ -39,6 +39,7 @@ cat (filename) | hashcomparefiles -(flag)
 
 # Examples:
 <h2> Small run, no flags</h2>
+
 ```python
 $ hashcomparefiles testdata/
 2026/03/08 16:18:33 Filecount after first pass: 17
@@ -71,7 +72,8 @@ $ hashcomparefiles testdata/
 
 ```
 
-# Full output from simple run with log output.
+<h2>Full output from simple run with log output.</h2>
+
 ```python
 $ hashcomparefiles -log default  testdata/
 2026/03/08 16:19:44 Filecount after first pass: 17
@@ -129,7 +131,8 @@ $ more log.log
 ```
 
 
-# Running with log on my home directory, note that the full run took about 1 minute.
+<h2> Running with log on my home directory, note that the full run took about 1 minute.</h2>
+
 ```python
 $ hashcomparefiles fullhome.log /home/gainax2k1/
  \ Files processed: 412300
@@ -166,7 +169,8 @@ $ more fullhome.log
 2026/03/08 16:22:24 (Done)
 ```
 
-# Piping in list of files and folders, then selectively removing them:
+<h2> Piping in list of files and folders, then selectively removing them: </h2>
+
 ```python
 $ cat testFilesList.txt | hashcomparefiles -remove
 2026/03/08 16:32:55 Filecount after first pass: 11
@@ -213,6 +217,7 @@ Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testS
 
 
 # Installation Instructions: 
+
 - Install Go, if not already installed, instuctions here:
 https://go.dev/doc/install
 
