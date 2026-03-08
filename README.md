@@ -38,129 +38,177 @@ cat (filename) | hashcomparefiles -(flag)
 - Pipe in list of files and or folders to compare against each other. Flags maintain functionality.
 
 # Examples:
-
+# Small run, no flags
 ```python
-hashcomparefiles testdata/
-2026/03/06 18:48:58 Duplicate files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
-2026/03/06 18:48:58 Duplicate files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileB.txt size: 20
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
-2026/03/06 18:48:58 Duplicate files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileC.txt size: 22
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
-2026/03/06 18:48:58 Duplicate files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileDDup.txt size: 30
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
-2026/03/06 18:48:58  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
-2026/03/06 18:48:58 Total files processed: 16
-2026/03/06 18:48:59  (Done)
+$ hashcomparefiles testdata/
+2026/03/08 16:18:33 Filecount after first pass: 17
+2026/03/08 16:18:33 Filecount after second pass: 12
+2026/03/08 16:18:33 Filecount after third pass: 12
+2026/03/08 16:18:33 Groups of duplicates after shrink: 4
+2026/03/08 16:18:33 Files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileB.txt size: 20
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
+2026/03/08 16:18:33  -- Duplicates: 3
+2026/03/08 16:18:33 Files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileDDup.txt size: 30
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
+2026/03/08 16:18:33  -- Duplicates: 3
+2026/03/08 16:18:33 Files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
+2026/03/08 16:18:33  -- Duplicates: 3
+2026/03/08 16:18:33 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileC.txt size: 22
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
+2026/03/08 16:18:33  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
+2026/03/08 16:18:33  -- Duplicates: 3
+2026/03/08 16:18:33 (Done)
+
 
 
 ```
 
-
+# Full output from simple run with log output.
 ```python
-hashcomparefiles -log default testdata/
-2026/03/06 18:58:22 Duplicate files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileB.txt size: 20
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
-2026/03/06 18:58:22 Duplicate files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileC.txt size: 22
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
-2026/03/06 18:58:22 Duplicate files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileDDup.txt size: 30
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
-2026/03/06 18:58:22 Duplicate files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
-2026/03/06 18:58:22 Total files processed: 16
-2026/03/06 18:58:23  (Done)
-gainax2k1@pop-os:~/Documents/workspace/hashcomparefiles$ more log.log 
-2026/03/06 18:58:22 Duplicate files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileB.txt size: 20
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
-2026/03/06 18:58:22 Duplicate files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileC.txt size: 22
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
-2026/03/06 18:58:22 Duplicate files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileDDup.txt size: 30
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
-2026/03/06 18:58:22 Duplicate files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
-2026/03/06 18:58:22  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
-2026/03/06 18:58:22 Total files processed: 16
-2026/03/06 18:58:23  (Done)
+$ hashcomparefiles -log default  testdata/
+2026/03/08 16:19:44 Filecount after first pass: 17
+2026/03/08 16:19:44 Filecount after second pass: 12
+2026/03/08 16:19:44 Filecount after third pass: 12
+2026/03/08 16:19:44 Groups of duplicates after shrink: 4
+2026/03/08 16:19:44 Files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
+2026/03/08 16:19:44  -- Duplicates: 3
+2026/03/08 16:19:44 Files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileB.txt size: 20
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
+2026/03/08 16:19:44  -- Duplicates: 3
+2026/03/08 16:19:44 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileC.txt size: 22
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
+2026/03/08 16:19:44  -- Duplicates: 3
+2026/03/08 16:19:44 Files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileDDup.txt size: 30
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
+2026/03/08 16:19:44  -- Duplicates: 3
+2026/03/08 16:19:44 (Done)
+$ more log.log 
+2026/03/08 16:19:44 Filecount after first pass: 17
+2026/03/08 16:19:44 Filecount after second pass: 12
+2026/03/08 16:19:44 Filecount after third pass: 12
+2026/03/08 16:19:44 Groups of duplicates after shrink: 4
+2026/03/08 16:19:44 Files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
+2026/03/08 16:19:44  -- Duplicates: 3
+2026/03/08 16:19:44 Files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileB.txt size: 20
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
+2026/03/08 16:19:44  -- Duplicates: 3
+2026/03/08 16:19:44 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileC.txt size: 22
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
+2026/03/08 16:19:44  -- Duplicates: 3
+2026/03/08 16:19:44 Files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileDDup.txt size: 30
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
+2026/03/08 16:19:44  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
+2026/03/08 16:19:44  -- Duplicates: 3
+2026/03/08 16:19:44 (Done)
+
 ```
 
 
-
+# Running with log on my home directory, note that the full run took about 1 minute.
 ```python
-hashcomparefiles -p /home/gainax2k1/
- / Files processed: 408900
-2026/03/07 03:47:11 Total files to process: 408943
- \ Files processed: 73500
+$ hashcomparefiles fullhome.log /home/gainax2k1/
+ \ Files processed: 412300
+2026/03/08 16:21:37 Filecount after first pass: 412379
+2026/03/08 16:21:55 Filecount after second pass: 382210
+2026/03/08 16:22:20 Filecount after third pass: 298294
+2026/03/08 16:22:20 Groups of duplicates after shrink: 83666
 
- <fast forward and edited for sheer volume of output>
+< cut for ammount of output >
 
-2026/03/07 03:48:03 Files with hash: e263c7c51686a204417e8b670bb1525bae5dbf73407e678ba645b3f6f2e3e22f
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/common/Proton - Experimental/files/share/default_pfx/drive_c/windows/system32/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/common/Proton - Experimental/files/share/default_pfx/drive_c/windows/syswow64/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/common/Proton - Experimental/files/share/wine/nls/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/1041920/pfx/drive_c/windows/system32/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/1041920/pfx/drive_c/windows/syswow64/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/1493710/pfx/drive_c/windows/system32/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/1493710/pfx/drive_c/windows/syswow64/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/1590760/pfx/drive_c/windows/system32/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/1590760/pfx/drive_c/windows/syswow64/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/3617780/pfx/drive_c/windows/system32/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/3617780/pfx/drive_c/windows/syswow64/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/3719980/pfx/drive_c/windows/system32/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/3719980/pfx/drive_c/windows/syswow64/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/4146670/pfx/drive_c/windows/system32/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/4146670/pfx/drive_c/windows/syswow64/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/4329470/pfx/drive_c/windows/system32/c_737.nls size: 66594
-2026/03/07 03:48:03  - /home/gainax2k1/.local/share/Steam/steamapps/compatdata/4329470/pfx/drive_c/windows/syswow64/c_737.nls size: 66594
+$ more fullhome.log 
+2026/03/08 16:21:37 Filecount after first pass: 412379
+2026/03/08 16:21:55 Filecount after second pass: 382210
+2026/03/08 16:22:20 Filecount after third pass: 298294
+2026/03/08 16:22:20 Groups of duplicates after shrink: 83666
 
-<edited again for sheer volume of output>
+< cut for amount of output >
 
-
-2026/03/07 03:51:03 Total unique hashes with numerous files in this batch: 83563
-2026/03/07 03:51:04 (Done)
-
+2026/03/08 16:22:24 Files with hash: 009a3b2574c24b179adfab8d8bfccc58b780d5c65a6cc306823175e5aa2eccf1
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/Steam/steamapps/common/SteamLinuxRuntime_sniper/sniper_platform_3.0.20260119.200241/files/share/mime/image/cgm.xml size: 1326
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/Steam/steamapps/common/SteamLinuxRuntime_sniper/var/tmp-20VPL3/usr/share/mime/image/cgm.xml size: 1326
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/Steam/steamrt64/pv-runtime/steam-runtime-steamrt/steamrt3c_platform_3c.0.20251202.187499/files/share/mime/image/cgm.xml size: 1326
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/Steam/steamrt64/pv-runtime/steam-runtime-steamrt/var/tmp-M3M0K3/usr/share/mime/image/cgm.xml size: 1326
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/Steam/steamrt64/steam-runtime-steamrt/var/tmp-SCQ1H3/usr/share/mime/image/cgm.xml size: 1326
+2026/03/08 16:22:24  -- Duplicates: 5
+2026/03/08 16:22:24 Files with hash: 6ba12c6b4b5fec8df3b5e6771c108eb7ef080561ab5fc2f5206b2b35f9e498bb
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/flatpak/repo/objects/6f/7b0ffebd1fee717dec30b2a6cc0b1869bee25e426c1dabfc7e12c966d902ea.file size: 2312
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/flatpak/runtime/org.gnome.Platform/x86_64/48/c7cdf5b885ebc70910207b6a4d62ffca3458036edc14d0972ca090b3797b52c3/files/share/icons/Adwaita/symbolic/status/network-wireless-offline-symbolic.svg size: 2312
+2026/03/08 16:22:24  -- Duplicates: 2
+2026/03/08 16:22:24 Files with hash: 28e5515b7f5b09ac8794c315822028e2ca1aaac7f8adb261e2257339cfd6e03e
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/flatpak/repo/objects/6d/e675ea1da1ddb2f90902e3566dab3ec8c724890efbb36f91e3ac83e5d4e2b4.file size: 24637
+2026/03/08 16:22:24  - /home/gainax2k1/.local/share/flatpak/runtime/org.freedesktop.Platform/x86_64/25.08/6482ce412b0584ab2e2191db1c1de27b7072b8945c20e83a661d284b9c10e6d4/files/lib/python3.13/site-packages/setuptools/__pycache__/build_meta.cpython-313.pyc size: 24637
+2026/03/08 16:22:24  -- Duplicates: 2
+2026/03/08 16:22:24 (Done)
 ```
 
+# Piping in list of files and folders, then selectively removing them:
 ```python
-cat testFilesList.txt | hashcomparefiles -p -remove
-2026/03/07 04:30:19 Total files to process: 8
-2026/03/07 04:30:19 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
-2026/03/07 04:30:19  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
-2026/03/07 04:30:19  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
-2026/03/07 04:30:19  -- Duplicates: 2
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt?
- - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > s
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt?
- - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > t
-2026/03/07 04:30:25 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt
-2026/03/07 04:30:25 Files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
-2026/03/07 04:30:25  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
-2026/03/07 04:30:25  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
-2026/03/07 04:30:25  -- Duplicates: 2
+$ cat testFilesList.txt | hashcomparefiles -remove
+2026/03/08 16:32:55 Filecount after first pass: 11
+2026/03/08 16:32:55 Filecount after second pass: 9
+2026/03/08 16:32:55 Filecount after third pass: 9
+2026/03/08 16:32:55 Groups of duplicates after shrink: 4
+2026/03/08 16:32:55 Files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
+2026/03/08 16:32:55  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
+2026/03/08 16:32:55  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
+2026/03/08 16:32:55  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
+2026/03/08 16:32:55  -- Duplicates: 3
 Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt?
+ - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > d
+2026/03/08 16:33:01 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt
+Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt?
+ - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > t
+2026/03/08 16:33:05 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt
+Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt?
+ - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > s
+2026/03/08 16:33:07 Files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
+2026/03/08 16:33:07  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
+2026/03/08 16:33:07  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
+2026/03/08 16:33:07  -- Duplicates: 2
+Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt?
  - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > c
-2026/03/07 04:30:26 (Done)
+2026/03/08 16:33:08 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
+2026/03/08 16:33:08  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
+2026/03/08 16:33:08  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
+2026/03/08 16:33:08  -- Duplicates: 2
+Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt?
+ - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > c
+2026/03/08 16:33:13 Files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
+2026/03/08 16:33:13  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
+2026/03/08 16:33:13  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
+2026/03/08 16:33:13  -- Duplicates: 2
+Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt?
+ - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > s
+Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt?
+ - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > d
+2026/03/08 16:33:20 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt
+2026/03/08 16:33:20 (Done)
+
 ```
 
 
