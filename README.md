@@ -1,6 +1,6 @@
 <h1> hashcomparefiles</h1>
 A robust CLI tool that computes file hashes to identify duplicate files regardless of filename, using SHA-256, and presents them to the user. This tool also makes it easy to selectively delete duplicate files, move them to trash, or output a list of all duplicate files with their filesize.
-*Currently running "brute force", fully hashing ever file (that's not a symlink/empty file), reworking to multi-pass method*
+It runs in a multi-pass method, minimizing disk hits and improving efficiency.
 
 * symlinks and empty files are ignored
 * sub-folders are automatically walked and included
@@ -20,11 +20,6 @@ hashcomparefiles (filename/directory)
 hashcomparefiles -remove (directory)
 ```
 - Processes all files, and goes through each group of hash-match files, allowing per-file deletion or trashing if desired. *Only fully supports FreeDesktop spec on primary drive in Linux based systems.* For non-Linux systems, or if running on an external mount in Linux, a folder is created in the working directory, and files are move into that, with corresponding .trashinfo files being created to record original file location. For this reason, it's highly recommended to run from the drive where files are stored. I would like to improve this in the future. 
-
-```python
-hashcomparefiles -p (directory)
-```
-- Scans through directory once without hashing to get total file count, then hashes the second run. Potentially useful for large runs (+1,000 files) to determine scale of run, at the cost of additional disk hits.
 
 
 ```python
