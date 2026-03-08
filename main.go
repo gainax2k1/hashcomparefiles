@@ -20,19 +20,17 @@ import (
 )
 
 type Config struct {
-	FilePath         string
-	TrashPath        string
-	TrashInfoPath    string
-	LogPath          string
-	RemoveFlag       bool
-	ShowPreHashCount bool
+	FilePath      string
+	TrashPath     string
+	TrashInfoPath string
+	LogPath       string
+	RemoveFlag    bool
 }
 
 func main() {
 	// Define flags and parse
 	removeFlag := flag.Bool("remove", false, "Selectively choose which duplicates to trash or delete if desired")
 	logFlag := flag.String("log", "none", "Log path, or 'default' for current directory")
-	showPreHashCountFlag := flag.Bool("p", false, "Show Pre-hash file count (Potentially usefull for large runs, but now hits storage twice)")
 
 	flag.Parse()
 
@@ -67,11 +65,10 @@ func main() {
 	}
 
 	config := Config{
-		TrashPath:        trashPath,
-		TrashInfoPath:    trashInfoPath,
-		LogPath:          *logFlag,
-		ShowPreHashCount: *showPreHashCountFlag,
-		RemoveFlag:       *removeFlag,
+		TrashPath:     trashPath,
+		TrashInfoPath: trashInfoPath,
+		LogPath:       *logFlag,
+		RemoveFlag:    *removeFlag,
 	}
 
 	// All output will be done through the logger, writing to file and/or screen based on config
