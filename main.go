@@ -203,7 +203,7 @@ nextHash:
 	for hash, paths := range hashMap {
 
 		//get counts for this hash
-		pathsCount := len(paths)
+		//pathsCount := len(paths)
 
 		subMap := map[string][]walkdir.FileInfo{
 			hash: paths,
@@ -213,9 +213,9 @@ nextHash:
 
 		// iterate through file list
 	nextDuplicate:
-		for i := 0; i < pathsCount; i++ {
+		for _, file := range paths {
 
-			fmt.Printf("Delete file: %s?\n", paths[i].FilePath)
+			fmt.Printf("Delete file: %s?\n", file.FilePath)
 
 			choice, err := getUserChoice(reader)
 			if err != nil {
@@ -224,20 +224,20 @@ nextHash:
 
 			switch choice {
 			case "d": //delete file
-				err := os.Remove(paths[i].FilePath)
+				err := os.Remove(file.FilePath)
 				if err != nil {
-					logger.Error("Error deleting file %s: %v", paths[i].FilePath, err)
+					logger.Error("Error deleting file %s: %v", file.FilePath, err)
 				} else {
-					logger.Log("Deleted duplicate file: %s", paths[i].FilePath)
+					logger.Log("Deleted duplicate file: %s", file.FilePath)
 				}
 				continue nextDuplicate
 
 			case "t": //trash file
-				err := trashFile(paths[i].FilePath, hash, config)
+				err := trashFile(file.FilePath, hash, config)
 				if err != nil {
-					logger.Error("Error deleting file %s: %v", paths[i].FilePath, err)
+					logger.Error("Error deleting file %s: %v", file.FilePath, err)
 				} else {
-					logger.Log("Deleted duplicate file: %s", paths[i].FilePath)
+					logger.Log("Deleted duplicate file: %s", file.FilePath)
 				}
 
 			case "s": //skip file
