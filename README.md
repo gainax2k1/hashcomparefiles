@@ -218,7 +218,8 @@ Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testS
 
 # Installation Instructions: 
 
-- Download compiled binaries under "Releases"
+- Download compiled binaries under "Releases" here:
+https://github.com/gainax2k1/hashcomparefiles/releases
 
   or, if you want to build your own:
 
