@@ -28,7 +28,6 @@ type Config struct {
 	RemoveFlag    bool
 	Minflag       int64
 	Maxflag       int64
-	VerboseFlag   bool
 }
 
 var maxFileSize int64 = math.MaxInt64
@@ -80,11 +79,10 @@ func main() {
 		RemoveFlag:    *removeFlag,
 		Minflag:       *minFlag,
 		Maxflag:       *maxFlag,
-		VerboseFlag:   *verboseFlag,
 	}
 
 	// All output will be done through the logger, writing to file and/or screen based on config
-	logger, err := logger.NewLogger(config.LogPath, config.VerboseFlag)
+	logger, err := logger.NewLogger(config.LogPath, *verboseFlag)
 	if err != nil {
 		log.Fatalf("Error creating logger: %v", err)
 	}
@@ -132,6 +130,7 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 		}
 	}
 	logger.Log("Filecount after first pass: %d", totalCount)
+	fmt.Printf("Filecount after first pass: %d\n", totalCount)
 
 	// SECOND PASS:
 	firstPassHashes := make(map[string][]walkdir.FileInfo)
@@ -166,6 +165,8 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 		}
 	}
 	logger.Log("Filecount after second pass: %d", totalCount)
+
+	fmt.Printf("\nFilecount after second pass: %d\n", totalCount)
 	spinnerCounter = 0
 
 	// THIRD PASS:
@@ -202,9 +203,13 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 
 	logger.Log("Filecount after third pass: %d", totalCount)
 
+	fmt.Printf("Filecount after third pass: %d\n", totalCount)
+
 	//shrink map
 	finalMap, totalCount := filterDuplicates(finalDuplicates)
+
 	logger.Log("Groups of duplicates after shrink: %d", totalCount)
+	fmt.Printf("Groups of duplicates after shrink: %d\n", totalCount)
 
 	if config.RemoveFlag {
 		err := removeFiles(finalMap, logger, &config)
