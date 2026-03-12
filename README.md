@@ -175,6 +175,7 @@ $
 ```
 
 <h2> Running with min/max flags on home: </h2>
+
 ```python
 $ hashcomparefiles -min 2048 -max 8128 -log minMaxHome.log /home/gainax2k1/
  / Files processed: 360100 
