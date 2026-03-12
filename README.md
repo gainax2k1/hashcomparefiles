@@ -14,7 +14,7 @@ This tool was developed and tested in a Linux environment (Pop!_OS 24.04 LTS), b
 ```python
 hashcomparefiles (filename/directory)
 ```
-- returns hash value of a single file or through directory and sub-directories, displaying lists of duplicate files with their size and their hash value
+- returns hash value of a single file or through directory and sub-directories. Won't display lists of duplicate files without -v.
 
 ```python
 hashcomparefiles -remove (directory)
@@ -171,6 +171,23 @@ $ more homeDir.log
 2026/03/12 12:28:22  - /home/gainax2k1/.local/share/flatpak/runtime/org.gnome.Platform/x86_64/48/c7cdf5b885ebc70910207b6a4d62ffca3458036edc14d0972ca090b3797b52c3/files/lib/x86_64-linux-gnu/frei0r-1/multiply.so size: 24472
 2026/03/12 12:28:22  -- Duplicates: 2
 2026/03/12 12:28:22 (Done)
+$
+```
+
+<h2> Running with min/max flags on home: </h2>
+```python
+$ hashcomparefiles -min 2048 -max 8128 -log minMaxHome.log /home/gainax2k1/
+ / Files processed: 360100 
+Filecount after pass (1/3): 360128
+Filecount after pass (2/3): 71221
+Filecount after pass (3/3): 60849
+Groups of duplicates after shrink: 20555
+$ hashcomparefiles -log fullHome.log /home/gainax2k1/
+ / Files processed: 360100 
+Filecount after pass (1/3): 360120
+Filecount after pass (2/3): 329443
+Filecount after pass (3/3): 263331
+Groups of duplicates after shrink: 81669
 $
 ```
 
