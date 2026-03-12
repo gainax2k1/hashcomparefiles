@@ -177,46 +177,96 @@ $
 <h2> Piping in list of files and folders, then selectively removing them: </h2>
 
 ```python
-$ cat testFilesList.txt | hashcomparefiles -remove
-2026/03/08 16:32:55 Filecount after first pass: 11
-2026/03/08 16:32:55 Filecount after second pass: 9
-2026/03/08 16:32:55 Filecount after third pass: 9
-2026/03/08 16:32:55 Groups of duplicates after shrink: 4
-2026/03/08 16:32:55 Files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
-2026/03/08 16:32:55  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
-2026/03/08 16:32:55  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
-2026/03/08 16:32:55  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
-2026/03/08 16:32:55  -- Duplicates: 3
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt?
- - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > d
-2026/03/08 16:33:01 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt?
+$ cat testFilesList.txt | hashcomparefiles -log piped.log  -remove
+2026/03/12 12:42:24 (Start)
+2026/03/12 12:42:24 Filecount after pass (1/3): 11
+Filecount after pass (1/3): 11
+2026/03/12 12:42:24 Filecount after pass (2/3): 9
+Filecount after pass (2/3): 9
+2026/03/12 12:42:24 Filecount after pass (3/3): 9
+Filecount after pass (3/3): 9
+2026/03/12 12:42:24 Groups of duplicates after shrink: 4
+Groups of duplicates after shrink: 4
+2026/03/12 12:42:24 Files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
+2026/03/12 12:42:24  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
+2026/03/12 12:42:24  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
+2026/03/12 12:42:24  -- Duplicates: 2
+Remove file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt?
+ - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > s
+Remove file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt?
  - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > t
-2026/03/08 16:33:05 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt?
- - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > s
-2026/03/08 16:33:07 Files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
-2026/03/08 16:33:07  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
-2026/03/08 16:33:07  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
-2026/03/08 16:33:07  -- Duplicates: 2
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt?
+2026/03/12 12:42:31 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt
+2026/03/12 12:42:31 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
+2026/03/12 12:42:31  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
+2026/03/12 12:42:31  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
+2026/03/12 12:42:31  -- Duplicates: 2
+Remove file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt?
  - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > c
-2026/03/08 16:33:08 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
-2026/03/08 16:33:08  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
-2026/03/08 16:33:08  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
-2026/03/08 16:33:08  -- Duplicates: 2
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt?
+2026/03/12 12:42:35 Files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
+2026/03/12 12:42:35  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
+2026/03/12 12:42:35  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
+2026/03/12 12:42:35  -- Duplicates: 2
+Remove file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt?
  - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > c
-2026/03/08 16:33:13 Files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
-2026/03/08 16:33:13  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
-2026/03/08 16:33:13  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
-2026/03/08 16:33:13  -- Duplicates: 2
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt?
+2026/03/12 12:42:37 Files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
+2026/03/12 12:42:37  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
+2026/03/12 12:42:37  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
+2026/03/12 12:42:37  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
+2026/03/12 12:42:37  -- Duplicates: 3
+Remove file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt?
  - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > s
-Delete file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt?
+Remove file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt?
  - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > d
-2026/03/08 16:33:20 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt
-2026/03/08 16:33:20 (Done)
+2026/03/12 12:42:43 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt
+Remove file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt?
+ - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > d
+2026/03/12 12:42:44 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt
+2026/03/12 12:42:44 (Done)
+$ more piped.log 
+2026/03/12 12:38:32 (Start)
+2026/03/12 12:38:32 Filecount after pass (1/3): 7
+2026/03/12 12:38:32 Filecount after pass (2/3): 4
+2026/03/12 12:38:32 Filecount after pass (3/3): 4
+2026/03/12 12:38:32 Groups of duplicates after shrink: 2
+2026/03/12 12:38:32 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
+2026/03/12 12:38:32  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
+2026/03/12 12:38:32  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
+2026/03/12 12:38:32  -- Duplicates: 2
+2026/03/12 12:38:40 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt
+2026/03/12 12:38:41 Files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
+2026/03/12 12:38:41  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
+2026/03/12 12:38:41  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
+2026/03/12 12:38:41  -- Duplicates: 2
+2026/03/12 12:38:43 (Done)
+2026/03/12 12:42:24 (Start)
+2026/03/12 12:42:24 Filecount after pass (1/3): 11
+2026/03/12 12:42:24 Filecount after pass (2/3): 9
+2026/03/12 12:42:24 Filecount after pass (3/3): 9
+2026/03/12 12:42:24 Groups of duplicates after shrink: 4
+2026/03/12 12:42:24 Files with hash: 7368ac39295432a153b1532cacf30c1a4b55cc94c246d6cce820a42c06ff8c2f
+2026/03/12 12:42:24  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileBDup.txt size: 20
+2026/03/12 12:42:24  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDup.txt size: 20
+2026/03/12 12:42:24  -- Duplicates: 2
+2026/03/12 12:42:31 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileBDu
+p.txt
+2026/03/12 12:42:31 Files with hash: a4978f74fe60dbc373e48f0486d767c8d866a8f94a45c661acf812e44d978a38
+2026/03/12 12:42:31  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileCDup.txt size: 22
+2026/03/12 12:42:31  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileCDup.txt size: 22
+2026/03/12 12:42:31  -- Duplicates: 2
+2026/03/12 12:42:35 Files with hash: 6f430d148a85e1475301f9bd44463cc8dc69bbc1a0e059eb7c7314734e8db6dd
+2026/03/12 12:42:35  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileD.txt size: 30
+2026/03/12 12:42:35  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileD.txt size: 30
+2026/03/12 12:42:35  -- Duplicates: 2
+2026/03/12 12:42:37 Files with hash: c0f5efbef0fe98aa90619444250b1a5eb23158d6686f0b190838f3d544ec85b9
+2026/03/12 12:42:37  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testFileA.txt size: 10
+2026/03/12 12:42:37  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt size: 10
+2026/03/12 12:42:37  - /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADup.txt size: 10
+2026/03/12 12:42:37  -- Duplicates: 3
+2026/03/12 12:42:43 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFileADup.txt
+2026/03/12 12:42:44 Deleted duplicate file: /home/gainax2k1/Documents/workspace/hashcomparefiles/testdata/testSubFolder/testFolderNested/testFileADu
+p.txt
+2026/03/12 12:42:44 (Done)
+
 
 ```
 
