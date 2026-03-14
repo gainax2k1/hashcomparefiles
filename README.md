@@ -79,7 +79,7 @@ That should be everything! Any issues with the project, feel free to reach out t
 Thanks, and have a day. =^.^=
 
 # 🤝 Contributing
-# Submit a pull request
+<h2>Submit a pull request</h2>
 
 If you'd like to contribute, please fork the repository and open a pull request to the `main` branch.
 
