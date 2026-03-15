@@ -10,6 +10,34 @@ It runs in a multi-pass method, minimizing disk hits and improving efficiency. I
 * The filesize is included for reference, and for the remote chance of hash collision.
 - This tool was developed and tested in a Linux environment (Pop!_OS 24.04 LTS), but I would like it to eventually fully operate in Mac and Windows environments as well. In paricular, the trashing processes in Mac and Windows is incompatible, and the input when selectively removing files currently uses TTY (which likely won't work in Windows, but is currently untested).
 
+
+
+
+## Quick Start: 
+
+### Download compiled binaries manually, under "Releases" here: 
+https://github.com/gainax2k1/hashcomparefiles/releases
+-Then, from the command line, type:
+```python
+go install hashcomparefiles-(version)
+```
+
+### Or, using the Go CLI:
+```python
+go install github.com/gainax2k1/hashcomparefiles@latest
+```
+
+### Or, if you want to build your own:
+
+- Install Go, if not already installed, instuctions here:
+https://go.dev/doc/install
+
+- Download repo
+- In root folder of repo, run:
+```python
+go build
+go install
+```
 # Usage:
 
 ```python
@@ -50,34 +78,7 @@ cat (filename) | hashcomparefiles -(flag)
 
 
 
-# Installation Instructions: 
 
-## Download compiled binaries manually, under "Releases" here: 
-https://github.com/gainax2k1/hashcomparefiles/releases
--Then, from the command line, type:
-```python
-go install hashcomparefiles-(version)
-```
-
-## Or, using the Go CLI:
-```python
-go install github.com/gainax2k1/hashcomparefiles@latest
-```
-
-## Or, if you want to build your own:
-
-- Install Go, if not already installed, instuctions here:
-https://go.dev/doc/install
-
-- Download repo
-- In root folder of repo, run:
-```python
-go build
-go install
-```
-
-That should be everything! Any issues with the project, feel free to reach out to me. 
-Thanks, and have a day. =^.^=
 
 # 🤝 Contributing
 <h2>Submit a pull request</h2>
@@ -303,3 +304,7 @@ p.txt
 
 ```
 
+<hr>
+
+That should be everything! Any issues with the project, feel free to reach out to me. 
+Thanks, and have a day. =^.^=
