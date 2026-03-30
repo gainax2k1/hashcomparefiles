@@ -338,7 +338,7 @@ func configTrash() (string, string, error) {
 		if _, err := os.Stat(trashInfoDir); os.IsNotExist(err) {
 			err := os.MkdirAll(trashInfoDir, 0755)
 			if err != nil {
-				return "", "", fmt.Errorf("Error creating trash info directory: %v", err)
+				return "", "", fmt.Errorf("error creating trash info directory: %v", err)
 			}
 		}
 	} else {
