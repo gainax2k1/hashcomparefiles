@@ -2,6 +2,7 @@ package walkdir
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -11,6 +12,13 @@ import (
 type FileInfo struct {
 	FilePath string
 	FileSize int64
+}
+
+func (f FileInfo) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("path", f.FilePath),
+		slog.Int64("size", f.FileSize),
+	)
 }
 
 func WalkGetFileSizes(dir string, logger *logging.Logger) (map[int64][]string, int, error) {

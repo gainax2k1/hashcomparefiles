@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 )
 
+const LOGBUFFERSIZE = 64 * 1024
+
 type Logger struct {
 	file      *os.File
 	writer    *bufio.Writer
@@ -36,8 +38,7 @@ func NewLogger(logPath string, verbose bool) (*Logger, error) {
 
 	if file != nil {
 		// Use a buffered writer for file performance
-
-		bWriter = bufio.NewWriter(file)
+		bWriter = bufio.NewWriterSize(file, LOGBUFFERSIZE)
 		handlers = append(handlers, slog.NewJSONHandler(bWriter, nil))
 	}
 

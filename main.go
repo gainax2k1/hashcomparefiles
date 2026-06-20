@@ -137,7 +137,7 @@ func process(targets []string, config Config, logger *logging.Logger) error {
 	// SECOND PASS:
 	totalCount = 0 //reset
 
-	sem := make(chan struct{}, 128) // limit go routines to 128 for hashing, since hashing is CPU intensive, this should optimize performance without overwhelming the system. Adjust as needed based on testing and system capabilities.
+	sem := make(chan struct{}, 32) // limit go routines to 128 for hashing, since hashing is CPU intensive, this should optimize performance without overwhelming the system. Adjust as needed based on testing and system capabilities.
 
 	for filesize, files := range fileSizeMap {
 
