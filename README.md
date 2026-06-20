@@ -305,6 +305,40 @@ p.txt
 ```
 
 <hr>
+<h2> "time -v" output run of home directory, uncached:</h2>
+
+```
+$ /usr/bin/time -v hashcomparefiles /home/gainax2k1/
+ | Files processed: 418400 
+Filecount after pass (1/3): 418493
+Filecount after pass (2/3): 386924
+Filecount after pass (3/3): 303634
+Groups of duplicates after shrink: 88734
+	Command being timed: "hashcomparefiles /home/gainax2k1/"
+	User time (seconds): 27.19
+	System time (seconds): 15.88
+	Percent of CPU this job got: 200%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:21.48
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 300480
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 35
+	Minor (reclaiming a frame) page faults: 103506
+	Voluntary context switches: 1064335
+	Involuntary context switches: 7981
+	Swaps: 0
+	File system inputs: 27459720
+	File system outputs: 286544
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+
+```
 
 That should be everything! Any issues with the project, feel free to reach out to me. 
 Thanks, and have a day. =^.^=
