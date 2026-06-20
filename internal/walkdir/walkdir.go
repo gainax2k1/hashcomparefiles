@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	logger "github.com/gainax2k1/hashcomparefiles/internal/logger"
+	logging "github.com/gainax2k1/hashcomparefiles/internal/logging"
 )
 
 type FileInfo struct {
@@ -13,7 +13,7 @@ type FileInfo struct {
 	FileSize int64
 }
 
-func WalkGetFileSizes(dir string, logger *logger.Logger) (map[int64][]string, int, error) {
+func WalkGetFileSizes(dir string, logger *logging.Logger) (map[int64][]string, int, error) {
 	// resolve absolute path of the directory
 	absDir, err := filepath.Abs(dir)
 	if err != nil {

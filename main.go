@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/gainax2k1/hashcomparefiles/internal/hashfile"
-	"github.com/gainax2k1/hashcomparefiles/internal/logger"
+	"github.com/gainax2k1/hashcomparefiles/internal/logging"
 	walkdir "github.com/gainax2k1/hashcomparefiles/internal/walkdir"
 )
 
@@ -36,7 +36,7 @@ var maxFileSize int64 = math.MaxInt64
 func main() {
 	// Define flags and parse
 	removeFlag := flag.Bool("remove", false, "Selectively choose which duplicates to trash or delete if desired")
-	logFlag := flag.String("log", "log.log", "Log filename, or 'default' for current directory log.log")
+	logFlag := flag.String("log", "slog.log", "Log filename, or 'default' for current directory log.log")
 	minFlag := flag.Int64("min", 1, "Minimum filesize to include (in bytes")
 	maxFlag := flag.Int64("max", maxFileSize, "Maximum filesize to include (in bytes)")
 	verboseFlag := flag.Bool("v", false, "Output complete duplicate list to screen upon completion")
@@ -87,24 +87,19 @@ func main() {
 	}
 
 	// All output will be done through the logger, writing to file and/or screen based on config
-	logger, err := logger.NewLogger(config.LogPath, *verboseFlag)
+	logger, err := logging.NewLogger(config.LogPath, *verboseFlag)
 	if err != nil {
 		log.Fatalf("Error creating logger: %v", err)
 	}
-
-	defer logger.Close()
-
-	logger.Log("(Start)")
+	defer logger.Close() // ensure even if panic, logger successfully closes
 
 	err = process(targets, config, logger)
 	if err != nil {
 		logger.Error("Error processing: %v", err)
 	}
-	logger.Log("(Done)")
-
 }
 
-func process(targets []string, config Config, logger *logger.Logger) error {
+func process(targets []string, config Config, logger *logging.Logger) error {
 	// 1. Make map (key=filesize, value=[]filepaths)
 	// --- ignore all symlinks, zero size files
 	// 2. For each key, if len(value) > 1, then run smaller hash on each file, make map of (key=hash, value=[]filepaths)
@@ -130,16 +125,16 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 		totalCount += count
 
 		for size, files := range dirMap {
-			if size < config.Maxflag && size > config.Minflag {
+			if size > config.Minflag && size < config.Maxflag {
 				fileSizeMap[size] = append(fileSizeMap[size], files...)
 			}
 		}
 	}
-	logger.Log("Filecount after pass (1/3): %d", totalCount)
+
+	logger.Info("pass_complete", "pass", 1, "count", totalCount)
 	fmt.Printf("Filecount after pass (1/3): %d\n", totalCount)
 
 	// SECOND PASS:
-	//firstPassHashes := make(map[string][]walkdir.FileInfo)
 	totalCount = 0 //reset
 
 	sem := make(chan struct{}, 128) // limit go routines to 128 for hashing, since hashing is CPU intensive, this should optimize performance without overwhelming the system. Adjust as needed based on testing and system capabilities.
@@ -157,7 +152,6 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 				defer func() { <-sem }()
 				processPartialFile(f, fs, logger)
 			}(file, filesize)
-			logger.Log("Processing file: %s size: %d", file, filesize)
 
 			spinnerCounter++
 			if spinnerCounter%100 == 0 {
@@ -166,21 +160,16 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 				fmt.Fprintf(os.Stderr, "\r %s Files processed: %d\r", getSpinner(spinnerCounter/100), spinnerCounter)
 
 			}
-			/*
-				logger.Log("Processing file: %s size: %d", file, files
-
-					wg.Add(1)
-					go processPartialFile(file, filesize, logger)
-			*/
 			totalCount++
 		}
-		//wg.Wait() // Wait for all goroutines to finish before moving to the next filesize group
 	}
 	wg.Wait() // Wait for all goroutines to finish before moving to the next step
-	logger.Log("Filecount after pass (2/3): %d", totalCount)
 
+	logger.Info("pass_complete", "pass", 2, "count", totalCount)
 	fmt.Printf("Filecount after pass (2/3): %d\n", totalCount)
 	spinnerCounter = 0
+
+	fileSizeMap = nil // free memory from first pass, since we now have the partial hashes in memory, we can release the file size map
 
 	// THIRD PASS:
 	//finalDuplicates := make(map[string][]walkdir.FileInfo)
@@ -211,26 +200,20 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 				// \r clears the line, then we print the spinner and count
 				fmt.Fprintf(os.Stderr, "\r %s Files processed: %d\r", getSpinner(spinnerCounter/100), spinnerCounter)
 			}
-
-			/*
-				wg.Add(1)
-				go processFullFile(file.FilePath, file.FileSize, logger)
-			*/
 			totalCount++
 		}
-		//wg.Wait()
-
 	}
 	wg.Wait()
 
-	logger.Log("Filecount after pass (3/3): %d", totalCount)
-
+	logger.Info("pass_complete", "pass", 3, "count", totalCount)
 	fmt.Printf("Filecount after pass (3/3): %d\n", totalCount)
+
+	firstPassHashes = nil // free memory from second pass, since we now have the full hashes in memory, we can release the partial hash map
 
 	//shrink map
 	finalMap, totalCount := filterDuplicates(finalDuplicates)
 
-	logger.Log("Groups of duplicates after shrink: %d", totalCount)
+	logger.Info("pass_complete", "pass", 4, "count", totalCount)
 	fmt.Printf("Groups of duplicates after shrink: %d\n", totalCount)
 
 	if config.RemoveFlag {
@@ -239,26 +222,38 @@ func process(targets []string, config Config, logger *logger.Logger) error {
 			return err
 		}
 	} else {
-		displayHashMap(logger, finalMap)
+		logHashMap(logger, finalMap)
 	}
 	return nil
 
 }
 
-func displayHashMap(logger *logger.Logger, hashMap map[string][]walkdir.FileInfo) {
+func logHashMap(logger *logging.Logger, hashMap map[string][]walkdir.FileInfo) {
+	totalDupes := 0
 	for hash, paths := range hashMap {
-		count := 0
-		logger.Log("Files with hash: %s", hash)
-		for _, path := range paths {
-			count++
-			logger.Log(" - %s size: %d", path.FilePath, path.FileSize)
-		}
-		logger.Log(" -- Duplicates: %d", count)
+		dupeCount := len(paths)
+		totalDupes += dupeCount
+		logger.Info("duplicates_found",
+			"hash", hash,
+			"found", dupeCount,
+			"files", paths,
+		)
 	}
+	logger.Info("scan_complete", "total_duplicates", totalDupes)
 
 }
 
-func removeFiles(hashMap map[string][]walkdir.FileInfo, logger *logger.Logger, config *Config) error {
+func displayHashMap(hashMap map[string][]walkdir.FileInfo) {
+	for hash, paths := range hashMap {
+		dupeCount := len(paths)
+		fmt.Printf("\nHash: %d, Duplicates: %d, Size: %d bytes\n", hash, dupeCount, paths[0].FileSize)
+		for _, path := range paths {
+			fmt.Printf(" - %s\n", path.FilePath)
+		}
+	}
+}
+
+func removeFiles(hashMap map[string][]walkdir.FileInfo, logger *logging.Logger, config *Config) error {
 	// Setup input for user choices for delete, remove, etc
 	tty, err := os.Open("/dev/tty")
 	if err != nil {
@@ -275,7 +270,7 @@ nextHash:
 			hash: paths,
 		}
 		//display list of files with this same hash
-		displayHashMap(logger, subMap)
+		displayHashMap(subMap)
 
 		// iterate through file list
 	nextDuplicate:
@@ -285,25 +280,37 @@ nextHash:
 
 			choice, err := getUserChoice(reader)
 			if err != nil {
-				logger.Error("Error geting user choice: %v", err)
+				logger.Error("choice_err",
+					"err", err,
+				)
 			}
 
 			switch choice {
 			case "d": //delete file
 				err := os.Remove(file.FilePath)
 				if err != nil {
-					logger.Error("Error deleting file %s: %v", file.FilePath, err)
+					logger.Error("elete_error",
+						"file_path", file.FilePath,
+						"err", err,
+					)
 				} else {
-					logger.Log("Deleted duplicate file: %s", file.FilePath)
+					logger.Info("deleted_file",
+						"file_path", file.FilePath,
+					)
 				}
 				continue nextDuplicate
 
 			case "t": //trash file
 				err := trashFile(file.FilePath, hash, config)
 				if err != nil {
-					logger.Error("Error deleting file %s: %v", file.FilePath, err)
+					logger.Error("trash_error",
+						"file_path", file.FilePath,
+						"err", err,
+					)
 				} else {
-					logger.Log("Deleted duplicate file: %s", file.FilePath)
+					logger.Info("trashed_file",
+						"file_path", file.FilePath,
+					)
 				}
 
 			case "s": //skip file
@@ -424,7 +431,7 @@ func getUserChoice(reader *bufio.Reader) (string, error) {
 	}
 
 	for {
-		fmt.Printf(" - (D)elete, (T)rash, (S)kip, (C)ontinue to next hash > ")
+		fmt.Printf("(D)elete, (T)rash, (S)kip, (C)ontinue to next hash --> ")
 
 		input, err := reader.ReadString('\n')
 		if err != nil {
@@ -460,11 +467,14 @@ var firstPassHashes = make(map[string][]walkdir.FileInfo)
 var mu sync.Mutex
 var wg sync.WaitGroup
 
-func processPartialFile(file string, filesize int64, logger *logger.Logger) {
+func processPartialFile(file string, filesize int64, logger *logging.Logger) {
 	defer wg.Done()
 	partialHash, err := hashfile.PartialHash(file)
 	if err != nil {
-		logger.Error("Error partial hashing file %s: %v", file, err)
+		logger.Error("partial_hash_error",
+			"file_path", file,
+			"err", err,
+		)
 		return
 	}
 	var fileInfo walkdir.FileInfo
@@ -477,11 +487,14 @@ func processPartialFile(file string, filesize int64, logger *logger.Logger) {
 
 var finalDuplicates = make(map[string][]walkdir.FileInfo)
 
-func processFullFile(file string, filesize int64, logger *logger.Logger) {
+func processFullFile(file string, filesize int64, logger *logging.Logger) {
 	defer wg.Done()
 	fullHash, err := hashfile.FullHash(file)
 	if err != nil {
-		logger.Error("Error full hashing file %s: %v", file, err)
+		logger.Error("full_hash_err",
+			"file_path", file,
+			"err", err,
+		)
 		return
 	}
 	var fileInfo walkdir.FileInfo
