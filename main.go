@@ -52,6 +52,8 @@ func main() {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
 			if path := strings.TrimSpace(scanner.Text()); path != "" {
+				// check if path already in targets here
+				// would need to check for substrings, ie "/home/gainax2k1/" and "/home"
 				targets = append(targets, path)
 			}
 		}
