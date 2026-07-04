@@ -248,7 +248,7 @@ func logHashMap(logger *logging.Logger, hashMap map[string][]walkdir.FileInfo) {
 func displayHashMap(hashMap map[string][]walkdir.FileInfo) {
 	for hash, paths := range hashMap {
 		dupeCount := len(paths)
-		fmt.Printf("\nHash: %d, Duplicates: %d, Size: %d bytes\n", hash, dupeCount, paths[0].FileSize)
+		fmt.Printf("\nHash: %s, Duplicates: %d, Size: %d bytes\n", hash, dupeCount, paths[0].FileSize)
 		for _, path := range paths {
 			fmt.Printf(" - %s\n", path.FilePath)
 		}
